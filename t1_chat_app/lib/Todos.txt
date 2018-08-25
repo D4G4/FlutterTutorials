@@ -1,0 +1,6 @@
+Create a automatic generated reply
+
+Implement Delete a message
+Implement goTo a message   (search message)
+Implement Firebase authentication
+Implement multipleDelete message

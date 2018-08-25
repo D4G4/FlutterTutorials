@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/t5_grid_tabs_steepers.iml" filepath="$PROJECT_DIR$/t5_grid_tabs_steepers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/t5_grid_tabs_steepers_android.iml" filepath="$PROJECT_DIR$/t5_grid_tabs_steepers_android.iml" />
+    </modules>
+  </component>
+</project>
