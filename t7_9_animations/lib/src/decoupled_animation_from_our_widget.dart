@@ -12,7 +12,7 @@ class MyApp extends StatefulWidget {
 /// give us back various numbers which will be passed to the AnimationController
 /// `vsync: this`
 class MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
-  Animation animation;
+  Animation tweenBasedAnimation;
   AnimationController animationController;
 
   @override
@@ -27,9 +27,9 @@ class MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     ///Tween is a StatelessObject
     ///In order to make animation update everytime a frame is changed,
     ///we add a listener to it and then call `setState()`
-    animation = Tween(begin: 0.0, end: 500.0).animate(animationController);
+    tweenBasedAnimation = Tween(begin: 0.0, end: 500.0).animate(animationController);
 
-    animation.addStatusListener((status) {
+    tweenBasedAnimation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         animationController.reverse();
       } else if (status == AnimationStatus.dismissed) {
@@ -43,8 +43,8 @@ class MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
   @override
   build(context) {
-    debugPrint("Build method called MyAppState ${animation.value}");
-    return LogoAnimation(animation: animation);
+    debugPrint("Build method called MyAppState ${tweenBasedAnimation.value}");
+    return LogoAnimation(animation: tweenBasedAnimation);
   }
 
   @override
@@ -55,12 +55,12 @@ class MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 }
 
 ///Allows us to seprate widget code from animation code
-///It does not maintain the State object
 ///
-///Because we are passing state form other class, we need to create a constructor
+///It does not maintain the State object on its own;
+///as we are passing state form other class, we need to create a constructor
 ///
-///As [Animation] is kind of Listenable for [MyAppState],
-///we pass this to our LogoAnimation?
+///Because [Animation] is kind of Listenable for [MyAppState],
+///we pass it to our LogoAnimation?
 ///
 ///We have removed the listener above there, why?
 ///The `AnimatedWidget` class knows to listen to the change in the frame
@@ -72,12 +72,12 @@ class LogoAnimation extends AnimatedWidget {
 
   @override
   build(context) {
-    Animation animation = listenable;
-    debugPrint("Build method called LogoAnimation ${animation.value}");
+    Animation tweenBasedAnimation = listenable;
+    debugPrint("Build method called LogoAnimation ${tweenBasedAnimation.value}");
     return Center(
       child: Container(
-        width: animation.value,
-        height: animation.value,
+        width: tweenBasedAnimation.value,
+        height: tweenBasedAnimation.value,
         child: FlutterLogo(),
       ),
     );
