@@ -1,0 +1,29 @@
+name: t12_gradients_fractional_offsets_page_views
+description: A new Flutter project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  photo_view: ^0.0.7
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^0.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  
+  assets:
+    - assets/wallpaper1.jpeg
+    - assets/wallpaper2.jpg
+    - assets/wallpaper3.png
+    - assets/wallpaper4.png
+    
+
