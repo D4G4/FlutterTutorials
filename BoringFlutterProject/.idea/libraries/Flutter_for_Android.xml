@@ -1,0 +1,33 @@
+<component name="libraryTable">
+  <library name="Flutter for Android">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-0.3.0/android/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.2.0/android/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.2.0/example/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.0/android/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.0/example/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.3/android/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.3/example/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/video_player-0.5.1/android/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/video_player-0.5.1/example/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/dev/integration_tests/channels/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/dev/integration_tests/external_ui/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/dev/integration_tests/flavors/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/dev/integration_tests/platform_interaction/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/dev/integration_tests/ui/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/dev/manual_tests/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/catalog/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/flutter_gallery/android/app/src/androidTest/java" />
+      <root url="file://$USER_HOME$/flutter/examples/flutter_gallery/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/flutter_view/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/hello_world/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/layers/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/platform_channel/android/app/src/androidTest/java" />
+      <root url="file://$USER_HOME$/flutter/examples/platform_channel/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/platform_view/android/app/src/main/java" />
+      <root url="file://$USER_HOME$/flutter/examples/stocks/android/app/src/main/java" />
+    </SOURCES>
+  </library>
+</component>
