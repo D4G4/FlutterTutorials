@@ -7,4 +7,4 @@ import 'package:t7_9_animations/src/physics_based_animation.dart'
     as physicsBasedAnimation;
 import 'package:t7_9_animations/src/drag_drop_widgets.dart' as dragDropWidgets;
 
-void main() => runApp(new dragDropWidgets.MyApp());
+void main() => runApp(new physicsBasedAnimation.MyApp());
