@@ -1,4 +1,4 @@
-name: t21_movie_searcher_rxdart_sqflite
+name: webviews_url_launcher
 description: A new Flutter project.
 
 version: 1.0.0+1
@@ -7,13 +7,11 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  sqflite: ^0.11.2+2
-  rxdart: ^0.18.1
-  path_provider: ^0.4.1
- 
-
+  flutter_webview_plugin: ^0.2.1+2
+  url_launcher: ^3.0.3
   flutter:
     sdk: flutter
+
 
   cupertino_icons: ^0.1.2
 
@@ -23,6 +21,4 @@ dev_dependencies:
 
 
 flutter:
-
-
   uses-material-design: true
