@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "261111017240",
+    "firebase_url": "https://flutterealtimedatabase.firebaseio.com",
+    "project_id": "flutterealtimedatabase",
+    "storage_bucket": "flutterealtimedatabase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261111017240:android:2dac574f358b2dcf",
+        "android_client_info": {
+          "package_name": "com.example.t24realtimedatabase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261111017240-td96j8b70dum4vupe1hbn471vbkp4u9t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOnqaOetJxqDbjQ-Fli6IQp7K-m2cagOA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
