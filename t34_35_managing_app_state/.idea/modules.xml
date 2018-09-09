@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/t34_35_managing_app_state.iml" filepath="$PROJECT_DIR$/t34_35_managing_app_state.iml" />
+      <module fileurl="file://$PROJECT_DIR$/t34_35_managing_app_state_android.iml" filepath="$PROJECT_DIR$/t34_35_managing_app_state_android.iml" />
+    </modules>
+  </component>
+</project>

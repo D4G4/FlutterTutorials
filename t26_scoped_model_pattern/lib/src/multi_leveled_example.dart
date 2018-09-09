@@ -34,6 +34,10 @@ class Home extends StatelessWidget {
 
 //Now our ScopedModelDescendant will try to find the nearest AppModel
 //which is in our case present in the Scaffold defined above
+
+//A ScopedModelDescendent widget allows you to pass the state form the 
+//Model of your widget. 
+//State changes will trigger re-rendering and you can call methodso n the Model.
 class Counter extends StatelessWidget {
   final String counterName;
   Counter({this.counterName});
