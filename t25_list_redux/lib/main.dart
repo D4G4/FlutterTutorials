@@ -3,6 +3,7 @@
 // Action: User event which gets dispatched to
 // Reducer : A function which updates the state
 
+//With redux, most components are decoupled, making UI changes very easy to make.
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -15,12 +16,18 @@ class ListState {
   ListState.initialState() : items = [];
 }
 
+//Every application event is represented as an Action that gets dispatched to a Reducer function.
 class AddAction {
   final String input;
 
   AddAction({this.input});
 }
 
+//A Reducer updates the Store with a new State depending on what Action it receives.
+//And whenever a new State is pushed through the Store, the View is recreated to reflect the changes
+//
+//Only business logic resides inside this reducer function
+//A Reducer function takes an Action and the current application State and it returns a new State object
 ListState reducer(ListState state, action) {
   if (action is AddAction) {
     //  Takes old items, pipes them into a new list list and adds the new input into it
@@ -123,6 +130,8 @@ class ListInputState extends State<ListInput> {
     //   },
     // );
 
+///StoreConnector can be used instead of `StoreBuilder` (a widget that receives store form `StoreProvider`)
+///StoreConnector allows your to convert `Store` into a `ViewModel`
     return StoreConnector<ListState, VoidCallback>(
         converter: (store) => () {
               store.dispatch(AddAction(input: controller.text));
@@ -156,3 +165,10 @@ class ViewList extends StatelessWidget {
         });
   }
 }
+
+
+///`Middleware` is a component that may process an `Action` before it reaches the `Reducer`
+///It receives the current application `State` and the `Action` that got dispatched,
+///and it can run some code(usually a side effect), s.a communicating with 3rd-party API
+///Finally, middleware may decide to dispatch the original `Action`, to dispatch a different one,
+///or to do nothing more.

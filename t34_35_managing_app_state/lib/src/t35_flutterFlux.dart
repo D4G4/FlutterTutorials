@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:t34_35_managing_app_state/src/t36_stores.dart';
+import 'package:t34_35_managing_app_state/src/t35_stores.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
 class MyApp extends StatelessWidget {
