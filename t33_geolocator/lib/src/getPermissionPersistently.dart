@@ -52,6 +52,8 @@ class HomeState extends State<Home> {
     } else {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
           content: Text("Dfuck is wrong with a stupid permission man?")));
+
+      await Geolocator().getCurrentPosition(LocationAccuracy.best);
     }
   }
 

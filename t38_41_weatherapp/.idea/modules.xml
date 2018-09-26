@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/t38_41_weatherapp.iml" filepath="$PROJECT_DIR$/t38_41_weatherapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/t38_41_weatherapp_android.iml" filepath="$PROJECT_DIR$/t38_41_weatherapp_android.iml" />
+    </modules>
+  </component>
+</project>
