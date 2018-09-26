@@ -93,16 +93,19 @@ class ListInputState extends State<ListInput> {
   Widget build(BuildContext context) {
     print("ListInputState build()");
 
-    ///With `StoreConnector` we can connect our current widget with the `store` of the applicaiton from anywhere we want.
+    ///With `StoreConnector` we can connect our current widget with the `store` of the applicaiton
+    ///from anywhere we want.
     ///Allows us to connect to the `store` in different parts of the application
     ///
     ///It has two major properties associated with it,
     /// `#1 converter`
-    ///     Takes our store and converts into a "ViewModel" and the ViewModel is essentially the version of the "model"
+    ///     Takes our store and converts into a "ViewModel" and
+    ///     the ViewModel is essentially the version of the "model"
     ///     that we can pass into the second property #2 builder
     ///
     // return StoreConnector<ListState, _ViewModel>(
-    //   //add TypeAnnotation so we know that we are taking in the ListState and we are dealing with the _ViewModel
+    //   //add TypeAnnotation so we know that we are taking in the
+    //   //ListState and we are dealing with the _ViewModel
 
     //   //converter: (store) => store.dispatch(AddAction),
     //   converter: (store) => _ViewModel(
@@ -138,9 +141,9 @@ class ListInputState extends State<ListInput> {
   }
 }
 
-//Stateless because we are not dispatching any action form it
-//Because ListInputState is updating out store, it will re-render
-//all of the widgets that are connected to our store
+///We kept it "Stateless" because we are not dispatching any action form it
+///'ListInputState' is updating our store, it will re-render
+///all of the widgets that are connected to our store
 class ViewList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,80 @@
+In redux, one needs 
+		-> A Store
+		-> An Action
+		-> A Reducer
+
+A Store holds the state of the entire application
+
+The action takes care of the user events and dispatches it to the store
+
+A Reducer is a function which updates the state and is used by Action
+
+
+Documenting a simple ReduxList example:
+
+#1:
+
+We first create a class which will be our State, let's call it `ListState`
+
+Think of it as a POJO and create a named constructor as 'initialState' where you'll initialze your data.
+
+And ofcource , a constructor to instantiates the list.
+
+
+#2: 
+Now we create our Action class,
+
+name it as 'AddAction
+
+define the variables which you need, let's say an 'input' String which 
+will be inserted in your list.
+
+
+#3
+
+Now you create a Reducer function 
+
+I REPEAT, Reducer FUNCTION
+
+YourStateClass reducerFunctionName(YourState state, action) {
+	if(action is YourDefinedActionClass){
+        return YourStateClass or whatever your want.
+
+	}
+}
+
+The importan point to note here is that whenever you are inserting 
+a new intem inside your list, you need to re-create the list.
+So, the following code will do the trick
+
+    return ListState(
+        items: []
+            ..addAll(state.items)
+            ..add(action.input));
+    )
+
+
+The UI part
+
+
+Now, you create a StoreProvider<YourState>
+
+Here, you'll wrap the entire app inside your StoreProvider  which is basically an InheritedWidget and 
+it gives everything in the widgetTree the access to the "Store" value
+
+Now we will use a special widget called 
+
+        StoreConnector 
+                it will give access to our Store
+
+
+Before using a StoreConnector, you need to use something called 
+
+    ViewModel
+
+    It Acts as a middleware between Action and Reducer
+    
+Define a typeDef function and use it as a Pattern for your VieModel
+
+
+
