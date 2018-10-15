@@ -1,0 +1,29 @@
+name: rx_via_weather_app
+description: A new flutter application project.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  json_annotation: ^1.2.0    
+  geolocator: ^2.1.0  
+  rx_command: ^3.0.0  
+  rx_widgets: ^2.0.0  
+  cupertino_icons: ^0.1.2
+  charcode: ^1.1.2  #These libraries define symbolic names for some character codes.
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^1.0.0
+  json_serializable: ^1.2.1 
+  
+
+flutter:
+  uses-material-design: true
+  application:
+    androidPackage: com.example.rxviaweatherapp
+    iosBundleIdentifier: com.example.rxViaWeatherApp
