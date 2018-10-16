@@ -11,7 +11,9 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^0.1.2
-  video_player: ^0.6.5
+  chewie: ^0.7.0
+  flutter_youtube: ^1.1.1
+
 
 
 dev_dependencies:
