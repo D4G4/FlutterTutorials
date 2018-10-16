@@ -17,6 +17,7 @@ class WeatherRepo {
   int cnt = 50; //Max
 
   void addCities(int count) {
+    print("Add cities");
     cnt = count;
   }
 
