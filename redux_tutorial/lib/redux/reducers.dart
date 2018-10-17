@@ -10,7 +10,13 @@ AppState appStateReducer(AppState state, action) {
   );
 }
 
-Reducer<List<Item>> itemReducer = combineReducers<List<Item>>([]);
+Reducer<List<Item>> itemReducer = combineReducers<List<Item>>([
+  TypedReducer<List<Item>, AddItemAction>(addItemReducer),
+  TypedReducer<List<Item>, RemoveItemAction>(removeItemReducer),
+  TypedReducer<List<Item>, RemoveItemsAction>(removeItemsReducer),
+  TypedReducer<List<Item>, ItemsLoadedAction>(loadItemReducer),
+  TypedReducer<List<Item>, ItemCompletedAction>(itemCompletedReducer)
+]);
 
 List<Item> addItemReducer(List<Item> items, AddItemAction action) {
   return []
@@ -26,8 +32,16 @@ List<Item> removeItemsReducer(List<Item> items, RemoveItemsAction action) {
   return [];
 }
 
-List<Item> loadItemReducer(List<Item> item, LoadedItemsAction action) {
+List<Item> loadItemReducer(List<Item> item, ItemsLoadedAction action) {
   return [];
+}
+
+List<Item> itemCompletedReducer(List<Item> items, ItemCompletedAction action) {
+  return items
+      .map((item) => item.id == action.item.id
+          ? item.copyWith(completed: !item.completed)
+          : item)
+      .toList();
 }
 
 // //Will allow us to manipulate multiple items

@@ -92,12 +92,18 @@ class ItemListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView(
         children: model.items
-            .map((item) => ListTile(
-                title: Text(item.body),
-                leading: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => model.removeItem(item),
-                )))
+            .map(
+              (item) => ListTile(
+                    title: Text(item.body),
+                    leading: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => model.removeItem(item),
+                    ),
+                    trailing: Checkbox(
+                        value: item.completed,
+                        onChanged: (b) => model.onCompleted(item)),
+                  ),
+            )
             .toList(),
       );
 }
@@ -120,8 +126,14 @@ class _ViewModel {
   final Function(String) addItems;
   final Function(Item) removeItem;
   final Function() removeItems;
+  final Function(Item) onCompleted;
 
-  _ViewModel({this.items, this.addItems, this.removeItem, this.removeItems});
+  _ViewModel(
+      {this.items,
+      this.addItems,
+      this.removeItem,
+      this.removeItems,
+      this.onCompleted});
 
   factory _ViewModel.create(Store<AppState> store) {
     _onAddItem(String body) {
@@ -136,10 +148,15 @@ class _ViewModel {
       store.dispatch(RemoveItemsAction());
     }
 
+    _onCompleted(Item item) {
+      store.dispatch(ItemCompletedAction(item));
+    }
+
     return _ViewModel(
         items: store.state.items,
         addItems: _onAddItem,
         removeItem: _onRemoveItem,
-        removeItems: _onRemoveItems);
+        removeItems: _onRemoveItems,
+        onCompleted: _onCompleted);
   }
 }

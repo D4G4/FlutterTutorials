@@ -13,7 +13,7 @@ class Item {
 
   //To keep consistent redux way of doing things
   //To have immutable state
-  Item copyWith({int id, String body}) {
+  Item copyWith({int id, String body, bool completed}) {
     return Item(
         id: id ?? this.id,
         body: body ?? this.body,
@@ -30,4 +30,7 @@ class Item {
         'body': body,
         'completed': completed,
       };
+
+  @override
+  String toString() => toJson().toString();
 }

@@ -35,7 +35,7 @@ Middleware<AppState> _loadFromPrefs(AppState state) {
         "Middleware Returning from _loadFromPrefs ${action.runtimeType.toString()}");
     next(action);
     loadFromPrefs()
-        .then((state) => store.dispatch(LoadedItemsAction(state.items)));
+        .then((state) => store.dispatch(ItemsLoadedAction(state.items)));
   };
 }
 

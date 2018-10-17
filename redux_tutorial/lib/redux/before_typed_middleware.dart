@@ -41,7 +41,7 @@ void appStateMiddleware(
 
     case GetItemsAction:
       await loadFromPrefs()
-          .then((state) => store.dispatch(LoadedItemsAction(state.items)));
+          .then((state) => store.dispatch(ItemsLoadedAction(state.items)));
       break;
   }
 }
