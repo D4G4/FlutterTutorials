@@ -43,7 +43,7 @@ YourStateClass reducerFunctionName(YourState state, action) {
 	}
 }
 
-The importan point to note here is that whenever you are inserting 
+The important point to note here is that whenever you are inserting 
 a new intem inside your list, you need to re-create the list.
 So, the following code will do the trick
 
@@ -59,22 +59,15 @@ The UI part
 
 Now, you create a StoreProvider<YourState>
 
-Here, you'll wrap the entire app inside your StoreProvider  which is basically an InheritedWidget and 
+Here, you'll wrap the entire app inside your StoreProvider (basically an InheritedWidget) and 
 it gives everything in the widgetTree the access to the "Store" value
 
 Now we will use a special widget called 
 
-        StoreConnector 
-                it will give access to our Store
-
+        StoreConnector :: it will give access to our Store
 
 Before using a StoreConnector, you need to use something called 
 
-    ViewModel
-
-    It Acts as a middleware between Action and Reducer
+    ViewModel :: acts as a middleware between Action and Reducer
     
-Define a typeDef function and use it as a Pattern for your VieModel
-
-
-
+Define a typeDef function and use it as a Pattern for your ViewModel

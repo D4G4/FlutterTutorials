@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import 'package:redux_dev_tools/redux_dev_tools.dart';
-import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
-
 import 'package:redux_tutorial/model/model.dart';
 import 'package:redux_tutorial/model/app_state.dart';
 import 'package:redux_tutorial/redux/actions.dart';
@@ -17,10 +14,10 @@ void main() => runApp(new MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final DevToolsStore<AppState> store = DevToolsStore<AppState>(
+    final Store<AppState> store = Store<AppState>(
       appStateReducer,
       initialState: AppState.initialState(),
-      middleware: appStateMiddleware(),
+      middleware: [appStateMiddleware],
     );
 
     return StoreProvider<AppState>(
@@ -28,9 +25,6 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Redux List tutorial',
         theme: ThemeData.dark(),
-
-        //StoreBuilder isn't really necessary, we are only using this because we want to pass
-        //store to our Descendant widget for DevToolsStore
         home: StoreBuilder<AppState>(
           onInit: (store) => store.dispatch(GetItemsAction()),
           builder: (context, Store<AppState> store) => Home(store),
@@ -40,15 +34,45 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//MiddlePiece that connects the User Interface to our Store
+//We can decide what we want to expose from our store and from our UI to the other parts of the application
+class _ViewModel {
+  final List<Item> items;
+  final Function(String) addItems;
+  final Function(Item) removeItem;
+  final Function() removeItems;
+
+  _ViewModel({this.items, this.addItems, this.removeItem, this.removeItems});
+
+  factory _ViewModel.create(Store<AppState> store) {
+    _onAddItem(String body) {
+      store.dispatch(AddItemAction(body));
+    }
+
+    _onRemoveItem(Item item) {
+      store.dispatch(RemoveItemAction(item));
+    }
+
+    _onRemoveItems() {
+      store.dispatch(RemoveItemsAction());
+    }
+
+    return _ViewModel(
+        items: store.state.items,
+        addItems: _onAddItem,
+        removeItem: _onRemoveItem,
+        removeItems: _onRemoveItems);
+  }
+}
+
 class Home extends StatelessWidget {
-  final DevToolsStore<AppState> store;
+  final Store<AppState> store;
   Home(this.store); //Not necessary though
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Redux Items")),
-        drawer: Container(child: ReduxDevTools(store)),
         body: StoreConnector<AppState, _ViewModel>(
           converter: (Store<AppState> store) => _ViewModel.create(store),
           builder: (context, _ViewModel viewModel) => Column(
@@ -111,35 +135,4 @@ class RemoveItemsButton extends StatelessWidget {
         child: Text("Delete all items"),
         onPressed: model.removeItems,
       );
-}
-
-//MiddlePiece that connects the User Interface to our Store
-//We can decide what we want to expose from our store and from our UI to the other parts of the application
-class _ViewModel {
-  final List<Item> items;
-  final Function(String) addItems;
-  final Function(Item) removeItem;
-  final Function() removeItems;
-
-  _ViewModel({this.items, this.addItems, this.removeItem, this.removeItems});
-
-  factory _ViewModel.create(Store<AppState> store) {
-    _onAddItem(String body) {
-      store.dispatch(AddItemAction(body));
-    }
-
-    _onRemoveItem(Item item) {
-      store.dispatch(RemoveItemAction(item));
-    }
-
-    _onRemoveItems() {
-      store.dispatch(RemoveItemsAction());
-    }
-
-    return _ViewModel(
-        items: store.state.items,
-        addItems: _onAddItem,
-        removeItem: _onRemoveItem,
-        removeItems: _onRemoveItems);
-  }
 }
