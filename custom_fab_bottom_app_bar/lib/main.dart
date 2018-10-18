@@ -41,11 +41,12 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {},
           child: Icon(Icons.healing),
           color: Colors.lightBlue,
+          notchMargin: 4.0,
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: MyBottomBar(
           color: Colors.green,
-          hasNotch: true,
+          hasNotch: false,
           notchMargin: 5.0,
         ),
       );
@@ -62,33 +63,38 @@ class MyBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomAppBar(
       color: color,
-      shape: hasNotch ? CircularNotchedRectangle() : null,
+      //shape: hasNotch ? CircularNotchedRectangle() : null,
       notchMargin: notchMargin ?? 2.0, //coalescing operator
-      child: Row(children: <Widget>[
-        IconButton(
-          icon: Icon(
-            Icons.menu,
-            color: Colors.white,
-          ),
-          onPressed: () => showModalBottomSheet(
-                context: context,
-                builder: (context) => Drawer(
-                      child: Column(
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.search),
-                            title: Text('Search App'),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.rotate_right),
-                            title: Text('Rotate App'),
-                          ),
-                        ],
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.menu,
+              color: Colors.white,
+            ),
+            onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (context) => Drawer(
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: Icon(Icons.search),
+                              title: Text('Search App'),
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.rotate_right),
+                              title: Text('Rotate App'),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-              ),
-        )
-      ]),
+                ),
+          ),
+          Expanded(
+            child: SizedBox(),
+          )
+        ],
+      ),
     );
   }
 }
