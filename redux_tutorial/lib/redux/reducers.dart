@@ -32,8 +32,8 @@ List<Item> removeItemsReducer(List<Item> items, RemoveItemsAction action) {
   return [];
 }
 
-List<Item> loadItemReducer(List<Item> item, ItemsLoadedAction action) {
-  return [];
+List<Item> loadItemReducer(List<Item> items, ItemsLoadedAction action) {
+  return action.items;
 }
 
 List<Item> itemCompletedReducer(List<Item> items, ItemCompletedAction action) {

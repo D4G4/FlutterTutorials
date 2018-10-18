@@ -54,6 +54,7 @@ void saveAndReplaceToPrefs(AppState state) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   var jsonStr = json.encode(state.toJson());
   await preferences.setString('itemState', jsonStr);
+  print("Saved into prefs");
 }
 
 Future<AppState> loadFromPrefs() async {
@@ -61,7 +62,10 @@ Future<AppState> loadFromPrefs() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   var jsonStr = preferences.getString(("itemState"));
   if (jsonStr != null) {
+    print("Json string is not null  \n $jsonStr");
     return AppState.fromJson(json.decode(jsonStr));
+  } else {
+    print("Got nothing from shared prefs");
   }
   return AppState.initialState();
 }
