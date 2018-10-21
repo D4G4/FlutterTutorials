@@ -1,0 +1,34 @@
+name: flutter_challenge_material_page_reveal
+description: A new flutter application project.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
+  application:
+    androidPackage: com.example.flutterchallengematerialpagereveal
+    iosBundleIdentifier: com.example.flutterChallengeMaterialPageReveal
+  assets:
+    - assets/banks.png
+    - assets/hotels.png
+    - assets/key.png
+    - assets/shopping_cart.png
+    - assets/stores.png
+    - assets/wallet.png  
+  fonts:
+    - family: FlamanteRoma
+      fonts:
+        - asset: assets/fonts/Flamante-Roma-Medium.ttf
+        - asset: assets/fonts/Flamante-Roma-MediumItalic.ttf
+          style: italic
