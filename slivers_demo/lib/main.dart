@@ -22,6 +22,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'some_other_tutorial.dart';
+
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -29,12 +31,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'What are Slivers',
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: new MyHomePage(title: 'Sliver Example'),
-    );
+        title: 'What are Slivers',
+        theme: new ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        //home: new MyHomePage(title: 'Sliver Example'),
+        home: OtherTutorialApp());
   }
 }
 
