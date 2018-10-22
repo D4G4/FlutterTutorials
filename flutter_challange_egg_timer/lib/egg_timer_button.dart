@@ -1,6 +1,11 @@
-part of 'main.dart';
+import 'package:flutter/material.dart';
 
 class EggTimerButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  EggTimerButton({@required this.icon, @required this.text});
+
   @override
   Widget build(BuildContext context) => FlatButton(
         splashColor: const Color(0x22000000),
@@ -13,15 +18,15 @@ class EggTimerButton extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 3.0),
                 child: Icon(
-                  Icons.pause,
+                  icon,
                   color: Colors.black,
                 ),
               ),
               Text(
-                'Pause',
+                text,
                 style: const TextStyle(
                   color: Colors.black,
-                  fontSize: 20.0,
+                  fontSize: 15.0,
                   letterSpacing: 3.0,
                   fontWeight: FontWeight.bold,
                 ),
