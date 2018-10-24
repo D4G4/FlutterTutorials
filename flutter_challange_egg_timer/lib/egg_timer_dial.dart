@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_challange_egg_timer/egg_timer_knob.dart';
 import 'package:flutter_challange_egg_timer/helper/radial_drag_gesture_detector.dart';
+import 'package:flutter_challange_egg_timer/egg_timer.dart';
 
 import 'dart:math';
 
@@ -14,6 +15,7 @@ class EggTimerDial extends StatefulWidget {
   final int ticksPerSection;
   final Function(Duration) onTimeSelected;
   final Function(Duration) onDialStopTurning;
+  final EggTimerState eggTimerState;
 
   EggTimerDial({
     this.currentTime = const Duration(minutes: 0),
@@ -21,72 +23,123 @@ class EggTimerDial extends StatefulWidget {
     this.ticksPerSection = 5,
     this.onTimeSelected,
     this.onDialStopTurning,
+    this.eggTimerState,
   });
 
   @override
   _EggTimerDialState createState() => _EggTimerDialState();
 }
 
-class _EggTimerDialState extends State<EggTimerDial> {
-  _rotationPercent() => widget.currentTime.inSeconds / widget.maxTime.inSeconds;
+class _EggTimerDialState extends State<EggTimerDial>
+    with SingleTickerProviderStateMixin {
+  static const RESET_SPEED_PERCENT_PER_SECONDS = 4;
+
+  EggTimerState prevEggTimerState;
+  double prevRotationPercent = 0.0;
+
+  AnimationController resetToZeroController;
+  Animation<double> resettingAnimation;
+
+  _knobRotationPercent() =>
+      widget.currentTime.inSeconds / widget.maxTime.inSeconds;
 
   // void _onTimeSelected(Duration duration) {
   //   print(duration.inMinutes);
   // }
 
   @override
-  Widget build(BuildContext context) => DialTurnGestureDetector(
-        maxTime: widget.maxTime,
-        currentTime: widget.currentTime,
-        onTimeSelected: widget.onTimeSelected,
-        onDialStopTurning: widget.onDialStopTurning,
-        child: Container(
-          width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: AspectRatio(
-              aspectRatio: 1.0, //Width = Height
-              child: Container(
-                  //OutermostCircle
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [GRADIENT_TOP, GRADIENT_BOTTOM],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color(0x44000000), //Black
-                          blurRadius: 2.0,
-                          spreadRadius: 1.0,
-                          offset: Offset(0.0, 1.0))
-                    ],
+  void initState() {
+    resetToZeroController = AnimationController(vsync: this); //No duration
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    resetToZeroController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //If we hit the reset button and previous state was not Ready
+    if (widget.currentTime.inSeconds == 0 &&
+        prevEggTimerState != EggTimerState.ready) {
+      //Run the animation
+      resettingAnimation = new Tween(begin: prevRotationPercent, end: 0.0)
+          .animate(resetToZeroController)
+            ..addListener(() => setState(() {}))
+            ..addStatusListener((status) {
+              if (status == AnimationStatus.completed) {
+                setState(() {
+                  resettingAnimation = null;
+                });
+              }
+            });
+      // resettingAnimation = Tween
+      resetToZeroController.duration = Duration(
+          milliseconds:
+              ((prevRotationPercent / RESET_SPEED_PERCENT_PER_SECONDS) * 1000)
+                  .round());
+      resetToZeroController.forward(from: 0.0);
+    }
+    prevEggTimerState = widget.eggTimerState;
+    prevRotationPercent = _knobRotationPercent();
+    return DialTurnGestureDetector(
+      maxTime: widget.maxTime,
+      currentTime: widget.currentTime,
+      onTimeSelected: widget.onTimeSelected,
+      onDialStopTurning: widget.onDialStopTurning,
+      child: Container(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          child: AspectRatio(
+            aspectRatio: 1.0, //Width = Height
+            child: Container(
+                //OutermostCircle
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [GRADIENT_TOP, GRADIENT_BOTTOM],
                   ),
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        padding: const EdgeInsets.all(55.0),
-                        child: CustomPaint(
-                          painter: TickerPainter(
-                              tickCount: widget.maxTime.inMinutes,
-                              ticksPerSection: widget.ticksPerSection),
-                        ),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0x44000000), //Black
+                        blurRadius: 2.0,
+                        spreadRadius: 1.0,
+                        offset: Offset(0.0, 1.0))
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      padding: const EdgeInsets.all(55.0),
+                      child: CustomPaint(
+                        painter: TickerPainter(
+                            tickCount: widget.maxTime.inMinutes,
+                            ticksPerSection: widget.ticksPerSection),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(65.0),
-                        child: EggTimerDialKnob(
-                            rotationPercent: _rotationPercent()),
-                      )
-                    ],
-                  )),
-            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(65.0),
+                      child: EggTimerDialKnob(
+                        rotationPercent: resettingAnimation == null
+                            ? _knobRotationPercent()
+                            : resettingAnimation.value,
+                      ),
+                    )
+                  ],
+                )),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class DialTurnGestureDetector extends StatefulWidget {
@@ -118,16 +171,36 @@ class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
   Duration startDragTime;
   Duration finalSelectedTime;
 
+  /// We are maintaining startDragTime as our currentTime which will usually be 0
+  /// so that from whatever position does the user start dragging, the actual dial should
+  /// start rotating from 0:00 only;
+  ///
+  /// So find the angle of the radialDrag and visualize the clock
+  /// find the number of seconds covered into that angle, starting from 0:00
+  /// also, the angle only rotates clock wise
+  /// In addition to that, the PolarCoord angle will range from -180 <-> +180
+  /// You have to convert it into 360 to make the angle positive
+  /// see `_makeAnglePositive(double angle)`
   _onRadialDragStart(PolarCoord coordinates) {
+    print("egg_timer_dial     _onRadialDragStart");
     startDragCoord = coordinates;
     startDragTime = widget.currentTime;
   }
 
   _onRadialDragUpdate(PolarCoord coordinates) {
+    print("egg_timer_dial     _onRadialDragUpdate");
+    print("egg_timer_dial     StartAngle ${startDragCoord.angle}");
+    print("egg_timer_dial     CoordAngle ${coordinates.angle}");
     //We have already received start
     if (startDragCoord != null) {
-      final angleDiff = coordinates.angle - startDragCoord.angle;
+      final angleDiff =
+          _makeAnglePositive(coordinates.angle - startDragCoord.angle);
+      print(
+          "egg_timer_dial     AngleDifference ${(coordinates.angle - startDragCoord.angle)}");
+      print("egg_timer_dial    Positive AngleDifference $angleDiff");
+
       final anglePercent = angleDiff / (2 * pi); //Angle swing
+      print("egg_timer_dial    anglePercent $anglePercent");
       final timeDiffInSeconds =
           (anglePercent * widget.maxTime.inSeconds).round();
       finalSelectedTime =
@@ -135,6 +208,8 @@ class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
       widget.onTimeSelected(finalSelectedTime);
     }
   }
+
+  _makeAnglePositive(double angle) => angle >= 0 ? angle : angle + 2 * pi;
 
   _onRadialDragEnd() {
     widget.onDialStopTurning(finalSelectedTime);
@@ -157,9 +232,9 @@ class TickerPainter extends CustomPainter {
   final LONG_TICK = 14.0;
   final SHORT_TICK = 4.0;
 
-  final tickCount;
+  final tickCount; //MaxTime in minutes
   final ticksPerSection;
-  final ticksInset;
+  // final ticksInset;
   final Paint tickPaint;
   final TextPainter textPainter;
   final TextStyle textStyle;
@@ -167,7 +242,7 @@ class TickerPainter extends CustomPainter {
   TickerPainter({
     this.tickCount = 35,
     this.ticksPerSection = 5,
-    this.ticksInset = 0.0,
+    // this.ticksInset = 0.0,
   })  : tickPaint = Paint(),
         textPainter = TextPainter(
           textAlign: TextAlign.center,

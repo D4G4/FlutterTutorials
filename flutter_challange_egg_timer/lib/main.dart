@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
   _MyAppState() {
     eggTimer = EggTimer(
         maxTime: const Duration(
-          minutes: 4,
+          minutes: 10,
         ),
         onTimerUpdate: _onTimerUpdate);
   }
@@ -71,9 +71,10 @@ class _MyAppState extends State<MyApp> {
               EggTimerDial(
                 currentTime: eggTimer.currentTime,
                 maxTime: eggTimer.maxTime,
-                ticksPerSection: 1,
+                ticksPerSection: 2,
                 onTimeSelected: _onTimeSelected,
                 onDialStopTurning: _onDialStopTurning,
+                eggTimerState: eggTimer.state,
               ),
               Expanded(
                 child: Container(),

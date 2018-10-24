@@ -65,6 +65,13 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
               ),
             ),
           ),
+          // Container(
+          //   width: double.infinity,
+          //   height: double.infinity,
+          //   child: CustomPaint(
+          //     painter: ArrowPainter(rotationPercent: widget.rotationPercent),
+          //   ),
+          // ),
         ],
       );
 }
@@ -86,6 +93,7 @@ class ArrowPainter extends CustomPainter {
 
     canvas.rotate(2 * pi * rotationPercent);
     Path path = Path();
+    //path.moveTo(0.0, 0.0);
     path.moveTo(0.0, -radius - 10.0);
     path.lineTo(10.0, -radius + 5.0); //Diaognal line of 45deg
     path.lineTo(-10.0, -radius + 5.0);

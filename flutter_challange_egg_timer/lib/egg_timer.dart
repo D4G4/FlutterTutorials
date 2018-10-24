@@ -15,12 +15,21 @@ class EggTimer {
   set currentTime(Duration newTime) {
     if (state == EggTimerState.ready) {
       _currentTime = newTime;
+      lastStartTime = _currentTime;
     }
     lastStartTime = _currentTime;
   }
 
+  _rountToTheNearestMinute(duration) {
+    return Duration(minutes: (duration.inSeconds / 60).round());
+  }
+
+//when _onDialStopTurning is triggered
   resume() {
     if (state != EggTimerState.running) {
+      if (state == EggTimerState.ready) {
+        _currentTime = _rountToTheNearestMinute(_currentTime);
+      }
       state = EggTimerState.running;
       stopwatch.start();
 
@@ -62,7 +71,7 @@ class EggTimer {
   }
 
   _tick() {
-    print('Current time: ${_currentTime.inSeconds}');
+    //print('Current time: ${_currentTime.inSeconds}');
     //Timer isn't that acurate so we use Stopwatch
     //Stopwatch counts up, and we count down
     _currentTime = lastStartTime - stopwatch.elapsed;
