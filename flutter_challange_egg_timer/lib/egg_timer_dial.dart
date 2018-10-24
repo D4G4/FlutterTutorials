@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_challange_egg_timer/egg_timer_knob.dart';
+import 'package:flutter_challange_egg_timer/helper/radial_drag_gesture_detector.dart';
+
 import 'dart:math';
 
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
@@ -10,12 +13,15 @@ class EggTimerDial extends StatefulWidget {
   final Duration maxTime;
   final int ticksPerSection;
   final Function(Duration) onTimeSelected;
+  final Function(Duration) onDialStopTurning;
 
-  EggTimerDial(
-      {this.currentTime = const Duration(minutes: 0),
-      this.maxTime = const Duration(minutes: 35),
-      this.ticksPerSection = 5,
-      this.onTimeSelected});
+  EggTimerDial({
+    this.currentTime = const Duration(minutes: 0),
+    this.maxTime = const Duration(minutes: 35),
+    this.ticksPerSection = 5,
+    this.onTimeSelected,
+    this.onDialStopTurning,
+  });
 
   @override
   _EggTimerDialState createState() => _EggTimerDialState();
@@ -24,8 +30,16 @@ class EggTimerDial extends StatefulWidget {
 class _EggTimerDialState extends State<EggTimerDial> {
   _rotationPercent() => widget.currentTime.inSeconds / widget.maxTime.inSeconds;
 
+  // void _onTimeSelected(Duration duration) {
+  //   print(duration.inMinutes);
+  // }
+
   @override
   Widget build(BuildContext context) => DialTurnGestureDetector(
+        maxTime: widget.maxTime,
+        currentTime: widget.currentTime,
+        onTimeSelected: widget.onTimeSelected,
+        onDialStopTurning: widget.onDialStopTurning,
         child: Container(
           width: double.infinity,
           child: Padding(
@@ -76,20 +90,65 @@ class _EggTimerDialState extends State<EggTimerDial> {
 }
 
 class DialTurnGestureDetector extends StatefulWidget {
-  Widget child;
+  final Widget child;
+  final currentTime;
+  final maxTime;
+  final Function(Duration) onTimeSelected;
+  final Function(Duration) onDialStopTurning;
 
-  DialTurnGestureDetector({this.child});
+  DialTurnGestureDetector({
+    this.child,
+    this.maxTime,
+    this.currentTime,
+    this.onTimeSelected,
+    this.onDialStopTurning,
+  });
 
   @override
   _DialTurnGestureDetectorState createState() =>
       _DialTurnGestureDetectorState();
 }
 
+// Systems do not talk like 0-360 but
+// 0 to 180 & 0 to -180
+// We need to understand what the current time is and only process the difference in angle
+// When the user drags, we care about the differnece in the angle
 class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
+  PolarCoord startDragCoord;
+  Duration startDragTime;
+  Duration finalSelectedTime;
+
+  _onRadialDragStart(PolarCoord coordinates) {
+    startDragCoord = coordinates;
+    startDragTime = widget.currentTime;
+  }
+
+  _onRadialDragUpdate(PolarCoord coordinates) {
+    //We have already received start
+    if (startDragCoord != null) {
+      final angleDiff = coordinates.angle - startDragCoord.angle;
+      final anglePercent = angleDiff / (2 * pi); //Angle swing
+      final timeDiffInSeconds =
+          (anglePercent * widget.maxTime.inSeconds).round();
+      finalSelectedTime =
+          Duration(seconds: startDragTime.inSeconds + timeDiffInSeconds);
+      widget.onTimeSelected(finalSelectedTime);
+    }
+  }
+
+  _onRadialDragEnd() {
+    widget.onDialStopTurning(finalSelectedTime);
+    startDragCoord = null;
+    finalSelectedTime = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return RadialDragGestureDetector(
       child: widget.child,
+      onRadialDragStart: _onRadialDragStart,
+      onRadialDragUpdate: _onRadialDragUpdate,
+      onRadialDragEnd: _onRadialDragEnd,
     );
   }
 }
