@@ -29,17 +29,17 @@ class _EggTimerTimeDisplayState extends State<EggTimerTimeDisplay>
 
   @override
   initState() {
-    selectionTimeSlideController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2))
-          ..addListener(() {
-            setState(() {});
-          });
+    selectionTimeSlideController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200))
+      ..addListener(() {
+        setState(() {});
+      });
 
-    countdownTimeFadeController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1))
-          ..addListener(() {
-            setState(() {});
-          });
+    countdownTimeFadeController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200))
+      ..addListener(() {
+        setState(() {});
+      });
 
     // selectionTimeSlideController.addStatusListener((AnimationStatus status) {
     //   if (status == AnimationStatus.completed) {
