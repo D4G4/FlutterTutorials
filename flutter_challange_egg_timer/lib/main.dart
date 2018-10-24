@@ -60,6 +60,8 @@ class _MyAppState extends State<MyApp> {
       body: Center(
         child: Container(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               EggTimerTimeDisplay(
                 eggTimerState: eggTimer.state,
@@ -69,14 +71,36 @@ class _MyAppState extends State<MyApp> {
               EggTimerDial(
                 currentTime: eggTimer.currentTime,
                 maxTime: eggTimer.maxTime,
-                ticksPerSection: 5,
+                ticksPerSection: 1,
                 onTimeSelected: _onTimeSelected,
                 onDialStopTurning: _onDialStopTurning,
               ),
               Expanded(
                 child: Container(),
               ),
-              EggTimerControls()
+              EggTimerControls(
+                eggTimerState: eggTimer.state,
+                onPause: () {
+                  setState(() {
+                    eggTimer.pause();
+                  });
+                },
+                onResume: () {
+                  setState(() {
+                    eggTimer.resume();
+                  });
+                },
+                onReset: () {
+                  setState(() {
+                    eggTimer.reset();
+                  });
+                },
+                onRestart: () {
+                  setState(() {
+                    eggTimer.restart();
+                  });
+                },
+              )
             ],
           ),
           decoration: BoxDecoration(

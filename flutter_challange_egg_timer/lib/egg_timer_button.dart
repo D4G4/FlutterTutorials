@@ -4,12 +4,14 @@ class EggTimerButton extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  EggTimerButton({@required this.icon, @required this.text});
+  final Function() onPressed;
+
+  EggTimerButton({@required this.icon, @required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) => FlatButton(
         splashColor: const Color(0x22000000),
-        onPressed: () {},
+        onPressed: onPressed,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Row(

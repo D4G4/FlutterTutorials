@@ -79,43 +79,43 @@ class _EggTimerTimeDisplayState extends State<EggTimerTimeDisplay>
       countdownTimeFadeController.reverse();
     }
     return Padding(
-        padding: const EdgeInsets.only(top: 15.0),
-        child: Center(
-          child: Stack(
-            children: <Widget>[
-              Transform(
-                transform: Matrix4.translationValues(
-                  0.0,
-                  -200.0 * selectionTimeSlideController.value,
-                  0.0,
-                ),
-                child: Text(
-                  _formattedSelectionTime,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 100.0,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 10.0,
-                      color: Colors.black,
-                      fontFamily: 'BebasNeue'),
-                ),
-              ),
-              Opacity(
-                opacity: 1.0 - countdownTimeFadeController.value,
-                //opacity:AnimatedOpacity,
-                child: Text(
-                  _formattedCountdownTime,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 100.0,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 10.0,
-                      color: Colors.black,
-                      fontFamily: 'BebasNeue'),
-                ),
-              )
-            ],
+      padding: const EdgeInsets.only(top: 15.0),
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Transform(
+            transform: Matrix4.translationValues(
+              0.0,
+              -200.0 * selectionTimeSlideController.value,
+              0.0,
+            ),
+            child: Text(
+              _formattedSelectionTime,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 100.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 10.0,
+                  color: Colors.black,
+                  fontFamily: 'BebasNeue'),
+            ),
           ),
-        ));
+          Opacity(
+            opacity: 1.0 - countdownTimeFadeController.value,
+            //opacity:AnimatedOpacity,
+            child: Text(
+              _formattedCountdownTime,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 100.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 10.0,
+                  color: Colors.black,
+                  fontFamily: 'BebasNeue'),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

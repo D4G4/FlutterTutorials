@@ -20,13 +20,46 @@ class EggTimer {
   }
 
   resume() {
-    state = EggTimerState.running;
-    stopwatch.start();
+    if (state != EggTimerState.running) {
+      state = EggTimerState.running;
+      stopwatch.start();
 
-    _tick();
+      _tick();
+    }
   }
 
-  pause() {}
+  pause() {
+    if (state == EggTimerState.running) {
+      state = EggTimerState.paused;
+      stopwatch.stop();
+    }
+
+    if (null != onTimerUpdate) {
+      onTimerUpdate();
+    }
+  }
+
+  reset() {
+    if (state == EggTimerState.paused) {
+      state = EggTimerState.ready;
+      _currentTime = const Duration(seconds: 0);
+      lastStartTime = _currentTime;
+      stopwatch.reset();
+    }
+    if (onTimerUpdate != null) {
+      onTimerUpdate();
+    }
+  }
+
+  restart() {
+    if (state == EggTimerState.paused) {
+      state = EggTimerState.running;
+      _currentTime = lastStartTime;
+      stopwatch.reset();
+      stopwatch.start();
+      _tick();
+    }
+  }
 
   _tick() {
     print('Current time: ${_currentTime.inSeconds}');
