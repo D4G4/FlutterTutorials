@@ -12,6 +12,13 @@ class _ZoomedScaffoldState extends State<ZoomedScaffold>
     with TickerProviderStateMixin {
   MenuController menuController;
 
+  //That another way to use Curve
+  Curve screenScaleDownCurve = Interval(0.0, 0.3, curve: Curves.easeOut);
+  Curve screenScaleUpCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
+
+  Curve screenSlideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
+  Curve screenSlideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
+
   @override
   void initState() {
     super.initState();
@@ -49,8 +56,31 @@ class _ZoomedScaffoldState extends State<ZoomedScaffold>
       ));
 
   Widget zoomAndSlideContent(Widget content) {
-    final slideAmount = 275.0 * menuController.percentOpen;
-    final contentScale = 1.0 - (0.2 * menuController.percentOpen);
+    var slidePercent, scalePercent;
+
+    switch (menuController.state) {
+      case MenuState.CLOSED:
+        slidePercent = 0.0;
+        scalePercent = 0.0;
+        break;
+      case MenuState.OPEN:
+        slidePercent = 1.0;
+        scalePercent = 1.0;
+        break;
+      case MenuState.OPENING:
+        slidePercent =
+            screenSlideOutCurve.transform(menuController.percentOpen);
+        scalePercent =
+            screenScaleDownCurve.transform(menuController.percentOpen);
+        break;
+      case MenuState.CLOSING:
+        slidePercent = screenSlideInCurve.transform(menuController.percentOpen);
+        scalePercent = screenScaleUpCurve.transform(menuController.percentOpen);
+        break;
+    }
+
+    final slideAmount = 275.0 * slidePercent;
+    final contentScale = 1.0 - (0.2 * scalePercent);
     final cornerRadius = 10.0 * menuController.percentOpen;
 
     return Transform(
@@ -89,24 +119,52 @@ class _ZoomedScaffoldState extends State<ZoomedScaffold>
 /// out of it and passes it to it's `builder() (typeDef)`
 /// and whatever builder function returns,
 /// that's what it is going to render.
-class ZoomedScaffoldMenuController extends StatelessWidget {
+class ZoomedScaffoldMenuController extends StatefulWidget {
   final ZoomedScaffoldBuilder zoomedScaffoldBuilder;
 
   ZoomedScaffoldMenuController({this.zoomedScaffoldBuilder});
 
+  _ZoomedScaffoldMenuControllerState createState() =>
+      _ZoomedScaffoldMenuControllerState();
+}
+
+class _ZoomedScaffoldMenuControllerState
+    extends State<ZoomedScaffoldMenuController> {
+  //whosoever calls this method says somewhere above them in a widget tree
+  // there is a _ZoomedScaffoldState, the one that contains MenuController
   getMenuController(BuildContext context) {
-    //whoever calls this method says somewhere above them in a widget tree
-    // there is a _ZoomedScaffoldState, the one that contains MenuController
+    print('getMenuController');
     final _ZoomedScaffoldState scaffoldState =
         context.ancestorStateOfType(TypeMatcher<_ZoomedScaffoldState>())
             as _ZoomedScaffoldState;
     return scaffoldState.menuController;
   }
 
+  MenuController menuController;
+
+  @override
+  void initState() {
+    super.initState();
+    menuController = getMenuController(context);
+    menuController.addListener(_onMenuControllerChange);
+  }
+
+  @override
+  void dispose() {
+    menuController.removeListener(_onMenuControllerChange);
+    super.dispose();
+  }
+
+  _onMenuControllerChange() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return zoomedScaffoldBuilder(context, getMenuController(context));
+    print('zoomed_scaffold.dart build()');
+    //A menthod named zoomedScaffoldBuilder will be called and returned
+    //Definition of which will be described inside the Calling widget.
+    return widget.zoomedScaffoldBuilder(context, menuController);
   }
 }
 
@@ -131,11 +189,12 @@ class Screen {
 class MenuController extends ChangeNotifier {
   final TickerProvider vsync;
   final AnimationController _animationController;
+  MenuState state = MenuState.CLOSED;
 
   MenuController({this.vsync})
       : _animationController = AnimationController(vsync: vsync) {
     _animationController
-      ..duration = const Duration(milliseconds: 250)
+      ..duration = const Duration(milliseconds: 300)
       ..addListener(() {
         notifyListeners();
       })
@@ -167,8 +226,6 @@ class MenuController extends ChangeNotifier {
   get percentOpen {
     return _animationController.value;
   }
-
-  MenuState state = MenuState.CLOSED;
 
   open() {
     _animationController.forward();
