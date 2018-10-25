@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_challange_hidden_drawer/zoom_scaffold.dart';
 
 class MenuScreen extends StatefulWidget {
   _MenuScreenState createState() => _MenuScreenState();
@@ -25,7 +26,7 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       ));
 
-  Widget createMenuItems() {
+  Widget createMenuItems(MenuController menuController) {
     return Transform(
       transform: Matrix4.translationValues(0.0, 255.0, 0.0),
       child: ListView(
@@ -33,18 +34,30 @@ class _MenuScreenState extends State<MenuScreen> {
           _MenuListItem(
             title: 'THE PADDOCK',
             isSelected: true,
+            onTap: () {
+              menuController.close();
+            },
           ),
           _MenuListItem(
             title: 'THE HERO',
             isSelected: false,
+            onTap: () {
+              menuController.close();
+            },
           ),
           _MenuListItem(
             title: 'HELP US GRROW',
             isSelected: false,
+            onTap: () {
+              menuController.close();
+            },
           ),
           _MenuListItem(
             title: 'SETTINGS',
             isSelected: false,
+            onTap: () {
+              menuController.close();
+            },
           ),
         ],
       ),
@@ -54,22 +67,27 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage('assets/dark_grunge_bk.jpg'), fit: BoxFit.cover),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: Stack(
-          children: <Widget>[
-            createMenuTitle(),
-            createMenuItems(),
-          ],
-        ),
-      ),
+    return ZoomedScaffoldMenuController(
+      zoomedScaffoldBuilder: (context, MenuController controller) {
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/dark_grunge_bk.jpg'),
+                fit: BoxFit.cover),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: Stack(
+              children: <Widget>[
+                createMenuTitle(),
+                createMenuItems(controller),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -77,13 +95,18 @@ class _MenuScreenState extends State<MenuScreen> {
 class _MenuListItem extends StatelessWidget {
   final bool isSelected;
   final String title;
+  final Function onTap;
 
-  _MenuListItem({this.isSelected, this.title});
+  _MenuListItem({
+    this.isSelected,
+    this.title,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) => InkWell(
         splashColor: const Color(0x44000000),
-        onTap: isSelected ? null : () {},
+        onTap: isSelected ? null : onTap,
         child: Container(
           width: double.infinity,
           child: Padding(
