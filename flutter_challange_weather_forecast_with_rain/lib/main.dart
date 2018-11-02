@@ -26,7 +26,7 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> with TickerProviderStateMixin {
-  OpenableController openableController;
+  OpenableController drawerController;
   SlidingRadialListController slidingRadialListController;
 
   String selectedDay = 'Sunday\nOctober 28';
@@ -34,12 +34,13 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    openableController = OpenableController(
+    drawerController = OpenableController(
         vsync: this, duration: const Duration(milliseconds: 250))
-      ..addListener(() => setState(() {}))
-      ..open();
+      ..addListener(() => setState(() {}));
 
-    slidingRadialListController = SlidingRadialListController()..open();
+    slidingRadialListController = SlidingRadialListController(
+        itemCount: forecastRadialList.items.length, vsync: this)
+      ..open();
   }
 
   @override
@@ -56,21 +57,22 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
             left: 0.0,
             right: 0.0,
             child: ForecastAppBar(
-              onDrawerArrowTap: openableController.open,
+              onDrawerArrowTap: drawerController.open,
               selectedDay: selectedDay,
             ),
           ),
           SlidingDrawer(
-            openableController: openableController,
+            openableController: drawerController,
             drawer: WeekDrawer(
               onDaySelected: (String selectedDayText) {
                 setState(() {
                   this.selectedDay = selectedDayText.replaceAll('\n', ',');
                 });
-                slidingRadialListController
-                    .close()
-                    .then((_) => slidingRadialListController.open());
-                openableController.close();
+                slidingRadialListController.close().then((_) {
+                  print('closed()');
+                  slidingRadialListController.open();
+                });
+                drawerController.close();
               },
             ),
           )

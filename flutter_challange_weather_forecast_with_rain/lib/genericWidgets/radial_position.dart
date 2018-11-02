@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+///A `StatelessWidget` which positioned the child widget with given angle and radius.
 class RadialPosition extends StatelessWidget {
   final double radius;
   final double angle;

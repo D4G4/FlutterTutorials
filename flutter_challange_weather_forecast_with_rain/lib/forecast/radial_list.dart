@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flutter_challange_weather_forecast_with_rain/genericWidgets/radial_position.dart';
+import 'dart:async';
 
 //Column -> MainAxisSize
 
@@ -13,40 +14,59 @@ class SlidingRadialList extends StatelessWidget {
     this.controller,
   });
 
-  Widget _radiaListItem(RadialListItemViewModel viewModel, double angle) {
+  /// Every Item will have it's own
+  ///   viewModel
+  ///   an angle
+  ///   and an opacity
+  ///
+  /// Each [RadialListItem] is Positioned under [RadialPosition]
+  ///
+  /// Behind the scenes, the radius stays the same and we will be animating the angle of each item.
+  Widget _radiaListItem(
+      RadialListItemViewModel viewModel, double angle, double opacity) {
     return Transform(
-      transform: Matrix4.translationValues(40.0, 334.0, 0.0),
-      child: RadialPosition(
-        radius: 140.0 + 75.0,
-        angle: angle,
-        child: RadialListItem(
-          listItem: viewModel,
+      transform: Matrix4.translationValues(
+        40.0,
+        334.0,
+        0.0,
+      ),
+      child: Opacity(
+        opacity: opacity,
+        child: RadialPosition(
+          radius: 140.0 + 75.0,
+          angle: angle,
+          child: RadialListItem(
+            listItem: viewModel,
+          ),
         ),
       ),
     );
   }
 
   List<Widget> _radialListItems() {
-    final double firstItemAngle = -pi / 3;
-    final double lastItemAngle = pi / 3;
-    final double angleDiffPerItem =
-        (lastItemAngle - firstItemAngle) / (radialList.items.length - 1);
-
-    double currAngle = firstItemAngle;
-
+    int index = 0;
     return radialList.items.map((RadialListItemViewModel viewModel) {
-      final listItem = _radiaListItem(viewModel, currAngle);
-      currAngle += angleDiffPerItem;
+      final listItem = _radiaListItem(
+        viewModel,
+        controller.getItemAngle(index),
+        controller.getItemOpacity(index),
+      );
+      ++index;
       return listItem;
     }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: _radialListItems(),
-      ),
+    //Animation isn't literal, you can pass in anything that implements listenable iterfact,
+    //Change notifier impletmens it
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (BuildContext context, Widget child) {
+        return Stack(
+          children: _radialListItems(),
+        );
+      },
     );
   }
 }
@@ -119,24 +139,31 @@ class RadialListItem extends StatelessWidget {
 
 class SlidingRadialListController extends ChangeNotifier {
   final double firstItemAngle = -pi / 3;
-  final double lastItemAngle = -pi / 3;
-  final double startSlidingAngle = 3 * pi / 4;
+  final double lastItemAngle = pi / 3;
+  final double startSlidingAngle =
+      3 * pi / 4; //Usually from the bottom of the screen
 
   final int itemCount;
   final AnimationController _slideController;
   final AnimationController _fadeController;
+  final List<Animation<double>> _slidePositionsAnimationList;
 
-  RadialListState _state;
-  Completer onOpenedCompleter;
-  Completed onClosedCompleter;
+  RadialListState _state = RadialListState.CLOSED;
+  Completer<Null> onOpenedCompleter;
+  Completer<Null> onClosedCompleter;
 
-  List<Animation<double>> _slidePositions;
-
-  SlidingRadialListController({this.itemCount, vsync})
-      : _slideController = AnimationController(
-            duration: const Duration(milliseconds: 1500), vsync: vsync),
+  SlidingRadialListController({
+    this.itemCount,
+    vsync,
+  })  : _slideController = AnimationController(
+          duration: const Duration(milliseconds: 1500),
+          vsync: vsync,
+        ),
         _fadeController = AnimationController(
-            duration: const Duration(milliseconds: 150), vsync: vsync) {
+          duration: const Duration(milliseconds: 150),
+          vsync: vsync,
+        ),
+        _slidePositionsAnimationList = [] {
     _slideController
       ..addListener(() => notifyListeners())
       ..addStatusListener((AnimationStatus status) {
@@ -148,6 +175,7 @@ class SlidingRadialListController extends ChangeNotifier {
           case AnimationStatus.completed:
             _state = RadialListState.OPEN;
             notifyListeners();
+            onOpenedCompleter.complete();
             break;
           case AnimationStatus.reverse:
           case AnimationStatus.dismissed:
@@ -161,13 +189,15 @@ class SlidingRadialListController extends ChangeNotifier {
         switch (status) {
           case AnimationStatus.forward:
             _state = RadialListState.FADING_OUT;
-            _slideController.value = 0.0;
-            _fadeController.value = 0.0;
             notifyListeners();
             break;
           case AnimationStatus.completed:
             _state = RadialListState.CLOSED;
+            _slideController.value = 0.0;
+            _fadeController.value = 0.0;
             notifyListeners();
+            onClosedCompleter
+                .complete(); //Will execute the future, that other people may have got back when they called close()
             break;
           case AnimationStatus.reverse:
           case AnimationStatus.dismissed:
@@ -184,28 +214,32 @@ class SlidingRadialListController extends ChangeNotifier {
         (lastItemAngle - firstItemAngle) / (itemCount - 1);
 
     for (var i = 0; i < itemCount; ++i) {
-      final start = delayInterval * i;
-      final end = start + slideInterval;
+      final startTime = delayInterval * i;
+      final endTime = startTime + slideInterval;
 
-      final endSlideAngle = firstItemAngle + (angleDeltaPerItem * i);
+      final endSlideAngle = firstItemAngle +
+          (angleDeltaPerItem * i); //From bottom till it's max (top)
 
-      _slidePositions.add(
-        Tween(begin: startSlidingAngle, end: endSlideAngle).animate(
+      _slidePositionsAnimationList.add(
+        Tween(
+          begin: startSlidingAngle,
+          end: endSlideAngle,
+        ).animate(
           CurvedAnimation(
             parent: _slideController,
             curve: Interval(
-              start,
-              end,
+              startTime,
+              endTime,
               curve: Curves.easeInOut,
             ),
           ),
         ),
       );
     }
-  }
+  } //end of constructor
 
   double getItemAngle(int index) {
-    return _slidePositions[index].value;
+    return _slidePositionsAnimationList[index].value;
   }
 
   double getItemOpacity(int index) {
@@ -225,7 +259,9 @@ class SlidingRadialListController extends ChangeNotifier {
   Future<Null> open() {
     if (_state == RadialListState.CLOSED) {
       _slideController.forward();
-      
+      onOpenedCompleter =
+          Completer(); //Because we have to wait around and trigger the completer.
+      return onOpenedCompleter.future;
     }
     return null;
   }
@@ -233,7 +269,8 @@ class SlidingRadialListController extends ChangeNotifier {
   Future<Null> close() {
     if (_state == RadialListState.OPEN) {
       _fadeController.forward();
-      //return Future
+      onClosedCompleter = Completer();
+      return onClosedCompleter.future;
     }
     return null;
   }
