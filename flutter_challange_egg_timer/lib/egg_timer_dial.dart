@@ -162,10 +162,17 @@ class DialTurnGestureDetector extends StatefulWidget {
       _DialTurnGestureDetectorState();
 }
 
-// Systems do not talk like 0-360 but
-// 0 to 180 & 0 to -180
-// We need to understand what the current time is and only process the difference in angle
-// When the user drags, we care about the differnece in the angle
+/// Systems do not talk like 0-360 but
+/// 0 to 180 & 0 to -180
+/// We need to understand what the current time is and only process the difference in angle
+/// When the user drags, we care about the differnece in the angle
+///
+/// When you are in the top section (layman's first and second quadrant)
+/// you are perceived to be in negative rotation and
+/// when you are in the bottom (third and fourth quad) you are in +ve rotation.
+///
+/// Layman's = -> First Quadrant -> Fourth -> Third  = 0 -> 180°
+/// Layman's = -> First Quadrant -> Second -> Third  = 0 -> -180°
 class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
   PolarCoord startDragCoord;
   Duration startDragTime;
@@ -174,6 +181,8 @@ class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
   /// We are maintaining startDragTime as our currentTime which will usually be 0
   /// so that from whatever position does the user start dragging, the actual dial should
   /// start rotating from 0:00 only;
+  ///
+  /// Analogy: (Max mins 35) user taps 5 and drags to 10, so rotate the dialer from 0 -> 5
   ///
   /// So find the angle of the radialDrag and visualize the clock
   /// find the number of seconds covered into that angle, starting from 0:00
@@ -195,14 +204,15 @@ class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
     if (startDragCoord != null) {
       final angleDiff =
           _makeAnglePositive(coordinates.angle - startDragCoord.angle);
+      //If user drags from 5 to 10, just get the angle difference.
       print(
           "egg_timer_dial     AngleDifference ${(coordinates.angle - startDragCoord.angle)}");
       print("egg_timer_dial    Positive AngleDifference $angleDiff");
 
-      final anglePercent = angleDiff / (2 * pi); //Angle swing
-      print("egg_timer_dial    anglePercent $anglePercent");
+      final anglePercentSwing = angleDiff / (2 * pi); //Angle swing
+      print("egg_timer_dial    anglePercent $anglePercentSwing");
       final timeDiffInSeconds =
-          (anglePercent * widget.maxTime.inSeconds).round();
+          (anglePercentSwing * widget.maxTime.inSeconds).round();
       finalSelectedTime =
           Duration(seconds: startDragTime.inSeconds + timeDiffInSeconds);
       widget.onTimeSelected(finalSelectedTime);
