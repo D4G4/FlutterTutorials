@@ -4,6 +4,8 @@ import 'package:flutter_challange_weather_forecast_with_rain/forecast/app_bar.da
 import 'package:flutter_challange_weather_forecast_with_rain/genericWidgets/sliding_drawer.dart';
 import 'package:flutter_challange_weather_forecast_with_rain/forecast/week_drawer.dart';
 import 'package:flutter_challange_weather_forecast_with_rain/forecast/forecast.dart';
+import 'package:flutter_challange_weather_forecast_with_rain/forecast/forecast_list.dart';
+import 'package:flutter_challange_weather_forecast_with_rain/forecast/radial_list.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,6 +27,8 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> with TickerProviderStateMixin {
   OpenableController openableController;
+  SlidingRadialListController slidingRadialListController;
+
   String selectedDay = 'Sunday\nOctober 28';
 
   @override
@@ -34,6 +38,8 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
         vsync: this, duration: const Duration(milliseconds: 250))
       ..addListener(() => setState(() {}))
       ..open();
+
+    slidingRadialListController = SlidingRadialListController()..open();
   }
 
   @override
@@ -41,7 +47,10 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          Forecast(),
+          Forecast(
+            radialList: forecastRadialList,
+            slidingListController: slidingRadialListController,
+          ),
           Positioned(
             top: 5.0,
             left: 0.0,
@@ -55,10 +64,13 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
             openableController: openableController,
             drawer: WeekDrawer(
               onDaySelected: (String selectedDayText) {
-                openableController.close();
                 setState(() {
                   this.selectedDay = selectedDayText.replaceAll('\n', ',');
                 });
+                slidingRadialListController
+                    .close()
+                    .then((_) => slidingRadialListController.open());
+                openableController.close();
               },
             ),
           )

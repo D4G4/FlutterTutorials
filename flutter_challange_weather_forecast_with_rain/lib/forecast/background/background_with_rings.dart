@@ -124,7 +124,7 @@ class WhiteCircleCutoutPainter extends CustomPainter {
       canvas.drawCircle(Offset(0.0, size.height / 2) + centerOffset,
           circles[i - 1].radius, borderPaint);
     }
-    // Mask the area of final circle
+    // Mask the area of final circle with last circle
     _maskCircle(canvas, size, circles.last.radius);
 
     // Draw an overlay that fills rest of the screen
