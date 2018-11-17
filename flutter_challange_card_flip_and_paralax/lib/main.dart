@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
+import 'dart:ui';
+import 'package:flutter_challange_card_flip_and_paralax/card_data.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
@@ -31,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  double scrollPercent = 0.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,15 +49,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //Cards
           Expanded(
-            child: CardFlipper(),
+            child: CardFlipper(
+                cards: demoCards,
+                onScroll: (double scrollPercent) {
+                  setState(() {
+                    this.scrollPercent = scrollPercent;
+                  });
+                }),
           ),
 
           //BottomBar
-          Container(
-            width: double.infinity,
-            height: 50.0,
-            color: Colors.grey,
-          )
+          BottomBar(cardCount: demoCards.length, scrollPercent: scrollPercent)
         ],
       ),
     );
@@ -62,6 +67,11 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class CardFlipper extends StatefulWidget {
+  final List<CardViewModel> cards;
+  final Function(double) onScroll;
+
+  CardFlipper({this.cards, this.onScroll});
+
   _CardFlipperState createState() => _CardFlipperState();
 }
 
@@ -77,16 +87,22 @@ class _CardFlipperState extends State<CardFlipper>
 
   AnimationController finishScrollController;
 
+  int numCards;
+
   @override
   void initState() {
     super.initState();
+    numCards = widget.cards.length;
 
     finishScrollController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
     )..addListener(() {
         setState(() {
-          scrollPercent = 0.0;
+          scrollPercent = lerpDouble(
+              finishScrollStart, finishScrollEnd, finishScrollController.value);
+          //print("addListener() $scrollPercent");
+          if (null != widget.onScroll) widget.onScroll(scrollPercent);
         });
       });
   }
@@ -107,22 +123,29 @@ class _CardFlipperState extends State<CardFlipper>
     final dragDistance = currDrag.dx - startDrag.dx;
     final singleCardDragPercent = dragDistance / context.size.width;
 
-    final numCards = 3;
     setState(() {
       // -ve bcz of graph
       //0.0 is correct for left but if we'll mark it as 100%, it will take us to the last card. so (1.0 - (1/ totalNoOfCards))
       scrollPercent =
           (startDragPercentScroll + (-singleCardDragPercent / numCards))
               .clamp(0.0, 1.0 - (1 / numCards));
-      print('scrollPercent $scrollPercent');
+      //print('scrollPercent $scrollPercent');
+
+      if (null != widget.onScroll) widget.onScroll(scrollPercent);
     });
   }
 
+  /// Find the scrollPercentage when user stopped dragging
+  /// Then figure out the endPercentage of scroll, i.e. whether we should go backwards or forward
+  /// We achieved this by .round()
+  /// Then simply use animationController values to perform the scrolling animation
   void _onHorizontalDragEnd(DragEndDetails details) {
-    final numCards = 3;
-
-    finishScrollStart = scrollPercent;
+    finishScrollStart = scrollPercent; //where user ended their scrolling
+    // Figuring out where do we want to animate to! What's the nearest card to snap to (so we used .round())
+    // By dividing by numberOfCards we get percentage from 0 -> 1
     finishScrollEnd = (scrollPercent * numCards).round() / numCards;
+    finishScrollController.forward(
+        from: 0.0); //from: 0.0 says run the full animation
 
     setState(() {
       startDrag = null;
@@ -131,24 +154,31 @@ class _CardFlipperState extends State<CardFlipper>
   }
 
   List<Widget> _buildCards() {
-    return [
-      _buildCard(0, 3, scrollPercent),
-      _buildCard(1, 3, scrollPercent),
-      _buildCard(2, 3, scrollPercent),
-    ];
+    int index = -1;
+    return widget.cards.map((CardViewModel viewModel) {
+      ++index;
+      return _buildCard(viewModel, index, numCards, scrollPercent);
+    }).toList();
   }
 
 // ScrollPercent: ScrollPercentage of the cards
-  Widget _buildCard(
-      int cardIndex, int cardCount, double totalScrollPercentage) {
+  Widget _buildCard(CardViewModel viewModel, int cardIndex, int cardCount,
+      double totalScrollPercentage) {
     //How many cards we have scrolled to the left
     //Scroll Percentage of all the cards / fraction of individual card
     final cardScrollPercent = totalScrollPercentage / (1 / cardCount);
+
+    /// if we are 3rd card out of 5, our essential scroll position is 3/5th
+    /// Of the whole 100% scrolling, our beginning is 3/5th i.e. 60%
+    ///
+    /// So we wanna know, how far to the left have we scrolled our current card.
+    final parallax = scrollPercent - (cardIndex / cardCount);
+
     return FractionalTranslation(
       translation: Offset(cardIndex - cardScrollPercent, 0.0),
       child: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Card(),
+        child: Card(viewModel: viewModel, parallaxPercent: parallax),
       ),
     );
   }
@@ -170,6 +200,10 @@ class _CardFlipperState extends State<CardFlipper>
 }
 
 class Card extends StatelessWidget {
+  final CardViewModel viewModel;
+  final double parallaxPercent;
+
+  Card({this.viewModel, this.parallaxPercent});
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -180,9 +214,16 @@ class Card extends StatelessWidget {
         //Background
         ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
-          child: Image.asset(
-            'assets/van_on_beach.jpg',
-            fit: BoxFit.cover,
+          child: FractionalTranslation(
+            translation: Offset(parallaxPercent * 2.0,
+                0.0), //2.0 is just arbitrary, to move it more than usual
+            child: OverflowBox(
+              maxWidth: double.infinity,
+              child: Image.asset(
+                viewModel.backdropAssetPath,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
 
@@ -194,7 +235,7 @@ class Card extends StatelessWidget {
               padding:
                   const EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0),
               child: Text(
-                '10th Street'.toUpperCase(),
+                viewModel.address.toUpperCase(),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20.0,
@@ -207,35 +248,12 @@ class Card extends StatelessWidget {
             Expanded(
               child: Container(),
             ),
-            //Superscrip isnt' available in flutter at this moment
-
-            // RichText(
-            //   text: TextSpan(
-            //     children: [
-            //       TextSpan(
-            //         text: 'Tap here',
-            //         style: TextStyle(fontSize: 50.0),
-            //         recognizer: TapGestureRecognizer()
-            //           ..onTap = () => Scaffold.of(context).showSnackBar(
-            //                 SnackBar(
-            //                   content: Text('Ok'),
-            //                   duration: const Duration(milliseconds: 500),
-            //                 ),
-            //               ),
-            //       ),
-            //       TextSpan(
-            //         text: 'FT',
-            //         style: TextStyle(fontSize: 10.0),
-            //       )
-            //     ],
-            //   ),
-            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  '2 - 3',
+                  '${viewModel.minHeightInFeet} - ${viewModel.maxHeightInFeet}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 140.0,
@@ -267,7 +285,7 @@ class Card extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: Text(
-                    '65.1°',
+                    '${viewModel.tempInDegrees}°',
                     style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'petita',
@@ -301,7 +319,7 @@ class Card extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(
-                        'Mostly cloudy',
+                        viewModel.weatherType,
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'petita',
@@ -317,7 +335,7 @@ class Card extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '11.2mph ENE',
+                        '${viewModel.windSpeedInMph}mph ${viewModel.cardinalDirection}',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'petita',
@@ -336,3 +354,136 @@ class Card extends StatelessWidget {
     );
   }
 }
+
+class BottomBar extends StatelessWidget {
+  final int cardCount;
+  final double scrollPercent;
+
+  BottomBar({this.cardCount, this.scrollPercent});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Center(
+              child: Icon(
+                Icons.settings,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              height: 5.0,
+              child: ScrollIndicator(
+                cardCount: cardCount,
+                scrollPercent: scrollPercent,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ScrollIndicator extends StatelessWidget {
+  final int cardCount;
+  final double scrollPercent;
+
+  ScrollIndicator({this.cardCount, this.scrollPercent});
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: ScrollIndicatorPainter(
+        cardCount: cardCount,
+        scrollPercent: scrollPercent,
+      ),
+      child: Container(),
+    );
+  }
+}
+
+class ScrollIndicatorPainter extends CustomPainter {
+  final int cardCount;
+  final double scrollPercent;
+
+  final Paint trackPaint;
+  final Paint thumbPaint;
+
+  ScrollIndicatorPainter({this.cardCount, this.scrollPercent})
+      : trackPaint = Paint()
+          ..color = const Color(0xFF444444)
+          ..style = PaintingStyle.fill,
+        thumbPaint = Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    //Draw the tarck
+    canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTWH(0.0, 0.0, size.width, size.height),
+          topLeft: Radius.circular(3.0),
+          topRight: Radius.circular(3.0),
+          bottomLeft: Radius.circular(3.0),
+          bottomRight: Radius.circular(3.0),
+        ),
+        trackPaint);
+
+    //Draw the thumb
+    final thumbWith = size.width / cardCount;
+    final thumbLeft = scrollPercent * size.width;
+
+    canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTWH(thumbLeft, 0.0, thumbWith, size.height),
+          topLeft: Radius.circular(3.0),
+          topRight: Radius.circular(3.0),
+          bottomLeft: Radius.circular(3.0),
+          bottomRight: Radius.circular(3.0),
+        ),
+        thumbPaint);
+  }
+
+  @override
+  bool shouldRepaint(ScrollIndicatorPainter oldPainter) {
+    return true;
+  }
+}
+
+//Superscrip isnt' available in flutter at this moment
+
+// RichText(
+//   text: TextSpan(
+//     children: [
+//       TextSpan(
+//         text: 'Tap here',
+//         style: TextStyle(fontSize: 50.0),
+//         recognizer: TapGestureRecognizer()
+//           ..onTap = () => Scaffold.of(context).showSnackBar(
+//                 SnackBar(
+//                   content: Text('Ok'),
+//                   duration: const Duration(milliseconds: 500),
+//                 ),
+//               ),
+//       ),
+//       TextSpan(
+//         text: 'FT',
+//         style: TextStyle(fontSize: 10.0),
+//       )
+//     ],
+//   ),
+// ),
