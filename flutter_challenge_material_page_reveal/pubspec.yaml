@@ -1,6 +1,5 @@
 name: flutter_challenge_material_page_reveal
 description: A new flutter application project.
-version: 1.0.0+1
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -18,7 +17,7 @@ flutter:
   uses-material-design: true
   application:
     androidPackage: com.example.flutterchallengematerialpagereveal
-    iosBundleIdentifier: com.example.flutterChallengeMaterialPageReveal
+    
   assets:
     - assets/banks.png
     - assets/hotels.png

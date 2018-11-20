@@ -241,6 +241,7 @@ class _CardFlipperState extends State<CardFlipper>
   }
 
   @override
+  
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragStart: _onHorizontalDragStart,
