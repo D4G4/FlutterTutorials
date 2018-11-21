@@ -38,6 +38,20 @@ final hardcodedPages = [
     'All local stores are categorized for your convenience',
     'assets/shopping_cart.png',
   ),
+  // PageViewModel(
+  //   const Color(0xFF9B90BC),
+  //   'assets/stores.png',
+  //   'Store',
+  //   'All local stores are categorized for your convenience',
+  //   'assets/shopping_cart.png',
+  // ),
+  // PageViewModel(
+  //   const Color(0xFF9B90BC),
+  //   'assets/stores.png',
+  //   'Store',
+  //   'All local stores are categorized for your convenience',
+  //   'assets/shopping_cart.png',
+  // ),
 ];
 
 class Page extends StatelessWidget {

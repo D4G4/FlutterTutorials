@@ -9,14 +9,13 @@ class PagerIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<PageBubble> bubbles = [];
-
+    var activeIndex = pagerIndicatorViewModel.activeIndex;
     for (var bubbleIndex = 0;
         bubbleIndex < pagerIndicatorViewModel.pages.length;
         ++bubbleIndex) {
       final PageViewModel page = pagerIndicatorViewModel.pages[bubbleIndex];
 
       var percentActive;
-      var activeIndex = pagerIndicatorViewModel.activeIndex;
       var slideDirection = pagerIndicatorViewModel.slideDirection;
 
       if (bubbleIndex == activeIndex) {
@@ -52,10 +51,35 @@ class PagerIndicator extends StatelessWidget {
         ),
       );
     }
+    // Subtract one half of the container size and then subtract one half of bubble width
+    // and will manage to get the first bubble to the center
+    // now add entire bubble with if the position of activeIndex is > 0 (first one)
+    const BUBBLE_WIDTH = 55.0;
+
+    final fullWidthOfPagerIndicator =
+        BUBBLE_WIDTH * pagerIndicatorViewModel.pages.length;
+
+    // when NoSliding is being done
+    double baseTranslation =
+        (fullWidthOfPagerIndicator / 2) - (BUBBLE_WIDTH / 2);
+
+    double translation = baseTranslation - (activeIndex * BUBBLE_WIDTH);
+
+    if (pagerIndicatorViewModel.slideDirection ==
+        SlideDirection.LEFT_TO_RIGHT) {
+      translation += BUBBLE_WIDTH * pagerIndicatorViewModel.slidePercent;
+    } else if (pagerIndicatorViewModel.slideDirection ==
+        SlideDirection.RIGHT_TO_LEFT) {
+      translation -= BUBBLE_WIDTH * pagerIndicatorViewModel.slidePercent;
+    }
+
     return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: bubbles,
+      child: Transform(
+        transform: Matrix4.translationValues(translation, 0.0, 0.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: bubbles,
+        ),
       ),
     );
   }
@@ -70,8 +94,9 @@ class PageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     double size = lerpDouble(20.0, 45.0, viewModel.activePercentAndOpacity);
     return Container(
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
+      width: 55.0,
+      height: 65.0,
+      child: Center(
         child: Container(
           width: size,
           height: size,
