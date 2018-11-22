@@ -1,0 +1,10 @@
+Flutter doesn't render the text that is off the screen
+
+    Simply wrap it under OverflowBox() and you are good to go
+
+
+Want to make your Widget produce ripple/TapEffect when tappeed?
+    
+    Wrap it under InkwellEffect()
+
+    NOTE: The widget(InkwellEffect) should be direct child of Material widget

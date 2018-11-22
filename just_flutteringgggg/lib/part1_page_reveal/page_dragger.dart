@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:just_flutteringgggg/part1_page_reveal/pager_indicator.dart';
+import 'dart:ui';
 
 class PageDragger extends StatefulWidget {
   final StreamController<SlideUpdate> slideUpdateStream;
@@ -60,7 +61,7 @@ class PageDraggerState extends State<PageDragger> {
     widget.slideUpdateStream.add(SlideUpdate(
       direction: slideDirection,
       updateType: UpdateType.DRAGGING,
-      percentage: slidePercent,
+      slidePercentage: slidePercent,
     ));
   }
 
@@ -69,7 +70,7 @@ class PageDraggerState extends State<PageDragger> {
     widget.slideUpdateStream.add(SlideUpdate(
       direction: SlideDirection.NONE,
       updateType: UpdateType.DONE_DRAGGING,
-      percentage: 0.0,
+      slidePercentage: 0.0,
     ));
   }
 
@@ -85,19 +86,16 @@ class PageDraggerState extends State<PageDragger> {
   }
 }
 
-enum UpdateType {
-  DRAGGING,
-  DONE_DRAGGING,
-  ANIMATING,
-}
+enum UpdateType { DRAGGING, DONE_DRAGGING, ANIMATING, DONE_ANIMATING }
 
+// A class which simply fires streamUpdate with it's each iteration
 class AnimatedPageDragger {
   // How quickly we want to expand or contract
   // You can also do that on the basis of dragVelocity, but it's complicated and here goes our : TODO
   // We can decice whether to expand or contract by a certain percent every millisecond
   static const PERCENT_PER_MILLISECOND = 0.005; //Based on experimentation
 
-  final double slideDirection;
+  final SlideDirection slideDirection;
   final TransitionGoal transitionGoal;
 
   AnimationController completionAnimationController;
@@ -109,6 +107,7 @@ class AnimatedPageDragger {
     StreamController<SlideUpdate> slideUpdateStream,
     TickerProvider vsync,
   }) {
+    var startSlidPercent = slidePercent;
     var endSlidePercent;
     var duration;
 
@@ -125,9 +124,36 @@ class AnimatedPageDragger {
           milliseconds: (slidePercent / PERCENT_PER_MILLISECOND).round());
     }
     completionAnimationController =
-        AnimationController(vsync: vsync, duration: duration);
+        AnimationController(vsync: vsync, duration: duration)
+          ..addListener(() {
+            slideUpdateStream.add(
+              SlideUpdate(
+                  direction: slideDirection,
+                  slidePercentage: lerpDouble(startSlidPercent, endSlidePercent,
+                      completionAnimationController.value),
+                  updateType: UpdateType.ANIMATING),
+            );
+          })
+          ..addStatusListener((AnimationStatus status) {
+            print('status $status');
+            if (status == AnimationStatus.completed) {
+              print('firing ocmpleted');
+              slideUpdateStream.add(SlideUpdate(
+                  direction: slideDirection,
+                  slidePercentage: endSlidePercent,
+                  updateType: UpdateType.DONE_ANIMATING));
+            }
+          });
   }
-}
+
+  void run() {
+    completionAnimationController.forward();
+  }
+
+  void dispose() {
+    completionAnimationController.dispose();
+  }
+} //end of class
 
 enum TransitionGoal {
   OPEN,
@@ -137,11 +163,11 @@ enum TransitionGoal {
 class SlideUpdate {
   final SlideDirection direction;
   final UpdateType updateType;
-  final double percentage;
+  final double slidePercentage;
 
   SlideUpdate({
     this.direction = SlideDirection.NONE,
     this.updateType = UpdateType.DONE_DRAGGING,
-    this.percentage = 0.0,
+    this.slidePercentage = 0.0,
   });
 }

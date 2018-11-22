@@ -1,1 +1,3 @@
 page_reveal.dart CircleRevealClipper -> getClip()   (trigonometry being applied)
+
+Center widget allows it's child to be as smaller as it can

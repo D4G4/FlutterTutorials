@@ -9,8 +9,10 @@ class MaterialPageRevealer extends StatefulWidget {
   _MaterialPageRevealerState createState() => _MaterialPageRevealerState();
 }
 
-class _MaterialPageRevealerState extends State<MaterialPageRevealer> {
+class _MaterialPageRevealerState extends State<MaterialPageRevealer>
+    with TickerProviderStateMixin {
   StreamController<SlideUpdate> slideUpdateStream;
+  AnimatedPageDragger dragger;
 
   int activeIndex = 0;
   SlideDirection slideDirection = SlideDirection.NONE;
@@ -24,7 +26,7 @@ class _MaterialPageRevealerState extends State<MaterialPageRevealer> {
       setState(() {
         if (event.updateType == UpdateType.DRAGGING) {
           slideDirection = event.direction;
-          slidePercent = event.percentage;
+          slidePercent = event.slidePercentage;
 
           if (slideDirection == SlideDirection.LEFT_TO_RIGHT) {
             nextPageIndex = activeIndex - 1;
@@ -34,13 +36,34 @@ class _MaterialPageRevealerState extends State<MaterialPageRevealer> {
             nextPageIndex = activeIndex;
           }
         } else if (event.updateType == UpdateType.DONE_DRAGGING) {
-          if (slidePercent > 0.5) {
-            activeIndex = slideDirection == SlideDirection.LEFT_TO_RIGHT
-                ? activeIndex - 1
-                : activeIndex + 1;
-          }
+          // Start animation
+          dragger = AnimatedPageDragger(
+            slideDirection: slideDirection,
+            slidePercent: slidePercent,
+            slideUpdateStream: slideUpdateStream,
+            transitionGoal: (slidePercent > 0.5)
+                ? TransitionGoal.OPEN
+                : TransitionGoal.CLOSE,
+            vsync: this,
+          )..run();
+          if (slidePercent > 0.5) nextPageIndex = activeIndex;
+        } else if (event.updateType == UpdateType.ANIMATING) {
+          print('animating');
+          slideDirection = event.direction;
+          slidePercent = event.slidePercentage;
+        } else if (event.updateType == UpdateType.DONE_ANIMATING) {
+          print('done animating');
+          // if (slidePercent > 0.5) {
+          //   activeIndex = slideDirection == SlideDirection.LEFT_TO_RIGHT
+          //       ? activeIndex - 1
+          //       : activeIndex + 1;
+          // }
+          // nextPageIndex = activeIndex;
+
+          activeIndex = nextPageIndex;
           slideDirection = SlideDirection.NONE;
           slidePercent = 0.0;
+          dragger.dispose();
         }
       });
     });

@@ -40,3 +40,9 @@ flutter:
         - asset: assets/fonts/Flamante-Roma-Medium.ttf
         - asset: assets/fonts/Flamante-Roma-MediumItalic.ttf
           style: italic
+    - family: bebas-neue
+      fonts:
+        - asset: assets/BebasNeue-Regular.ttf
+    - family: mermaid
+      fonts:
+        - asset:  assets/Mermaid1001.ttf

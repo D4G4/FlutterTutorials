@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_challange_hidden_drawer/zoom_scaffold.dart';
+import 'package:just_flutteringgggg/part_2_hidden_drawer/screen.dart';
 
 final Screen restaurantScreen = Screen(
     title: 'THE PALEO PADDOCK',
-    background: DecorationImage(
+    decorationImage: DecorationImage(
       image: AssetImage('assets/wood_bk.jpg'),
       fit: BoxFit.cover,
     ),
