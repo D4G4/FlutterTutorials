@@ -16,7 +16,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
     return Stack(
       children: <Widget>[
         ZoomedScaffold(
-          menuList: MenuScreen(),
+          menuScreen: MenuScreen(),
           activeScreen: activeScreen,
         )
       ],
