@@ -14,8 +14,9 @@ class _ZoomedScaffoldState extends State<ZoomedScaffold>
     with TickerProviderStateMixin {
   MenuController menuController;
 
-  // We want the entire animation to happen in first 30%
-  Curve scaleDownCurve = Interval(0.0, 0.3, curve: Curves.easeOut);
+  Curve scaleDownCurve = Interval(0.0, 0.3,
+      curve: Curves
+          .easeOut); // We want the entire animation to happen in first 30%
   Curve scaleUpCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   Curve slideOutCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
   Curve slideInCurve = Interval(0.0, 1.0, curve: Curves.easeOut);
@@ -70,7 +71,7 @@ class _ZoomedScaffoldState extends State<ZoomedScaffold>
   zoomAndSlideContent(Widget content) {
     final percentOpen = menuController.percentOpen;
     var slidePerent, scalePercent;
-    print('percentOpen = $percentOpen');
+    //print('percentOpen = $percentOpen');
     switch (menuController.state) {
       case MenuState.CLOSED:
         slidePerent = 0.0;
@@ -81,12 +82,12 @@ class _ZoomedScaffoldState extends State<ZoomedScaffold>
         scalePercent = 1.0;
         break;
       case MenuState.OPENING:
-        print('MenuState.opening');
+        //print('MenuState.opening');
         slidePerent = slideOutCurve.transform(percentOpen);
         scalePercent = scaleDownCurve.transform(percentOpen);
-        print('slidePercent = $slidePerent');
-        print('scalePercent = $scalePercent');
-        print('\n\n');
+        // print('slidePercent = $slidePerent');
+        // print('scalePercent = $scalePercent');
+        // print('\n\n');
         break;
       case MenuState.CLOSING:
         slidePerent = slideInCurve.transform(menuController.percentOpen);
@@ -183,10 +184,32 @@ class MenuController extends ChangeNotifier {
   }
 }
 
-class ZoomScaffoldMenuController extends StatelessWidget {
+class ZoomScaffoldMenuController extends StatefulWidget {
   final ZoomScaffoldBuilder builder;
 
   ZoomScaffoldMenuController({this.builder});
+
+  @override
+  ZoomScaffoldMenuControllerState createState() {
+    return new ZoomScaffoldMenuControllerState();
+  }
+}
+
+class ZoomScaffoldMenuControllerState
+    extends State<ZoomScaffoldMenuController> {
+  MenuController menuController;
+  @override
+  void initState() {
+    super.initState();
+    menuController = getMenuController(context);
+    menuController.addListener(_onMenuControllerChange);
+  }
+
+  @override
+  void dispose() {
+    menuController.removeListener(_onMenuControllerChange);
+    super.dispose();
+  }
 
   MenuController getMenuController(BuildContext context) {
     /// Somewhere above the widgetTree is the [_ZoomedScaffoldState]
@@ -198,10 +221,14 @@ class ZoomScaffoldMenuController extends StatelessWidget {
     return scaffoldState.menuController;
   }
 
+  _onMenuControllerChange() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: builder(context, getMenuController(context)),
+      child: widget.builder(context, getMenuController(context)),
     );
   }
 }

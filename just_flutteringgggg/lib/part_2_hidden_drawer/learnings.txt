@@ -8,3 +8,11 @@ Want to make your Widget produce ripple/TapEffect when tappeed?
     Wrap it under InkwellEffect()
 
     NOTE: The widget(InkwellEffect) should be direct child of Material widget
+
+
+We built our controller, some animation occurs and we want the Widgets of our controller to listen to it
+Simply call setState inside your Controller;
+
+
+
+To animate list item, we wrapped each list item inside AnimatedListItem
