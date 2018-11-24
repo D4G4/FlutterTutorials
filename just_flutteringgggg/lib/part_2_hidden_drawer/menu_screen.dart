@@ -33,7 +33,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ZoomScaffoldMenuController(
       builder: (context, MenuController menuController) {
-        print('inside menuController');
+        // print('inside menuController');
         return Container(
           width: double.infinity,
           height: double.infinity,
@@ -58,7 +58,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   }
 
   createMenuTitle(MenuState state) {
-    print('createMenuTitle $state');
+    // print('createMenuTitle $state');
     switch (state) {
       case MenuState.OPEN:
       case MenuState.OPENING:
@@ -103,7 +103,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   }
 
   createMenuItems(MenuController controller) {
-    print('State ${controller.state}');
+    // print('State ${controller.state}');
     var selectedIndex = 0;
     List<AnimatedMenuItem> itemsList = [];
 
@@ -117,9 +117,9 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       MenuItem menuItem = widget.menuList.items[i];
       var startAnimation = i * perItemDelay;
       var endAnimation = animationIntervalDuration + perItemDelay;
-      print('startAnimation $startAnimation');
-      print('endAnimation $endAnimation');
-      print('\n\n');
+      // print('startAnimation $startAnimation');
+      // print('endAnimation $endAnimation');
+      // print('\n\n');
       itemsList.add(
         AnimatedMenuItem(
           curve: Interval(startAnimation, endAnimation, curve: Curves.easeOut),
@@ -194,12 +194,17 @@ class _AnimatedMenuItemState extends AnimatedWidgetBaseState<AnimatedMenuItem> {
     _opacityTween = tweenVisitor(
       _opacityTween,
       opacity,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) {
+        print('value = $value');
+        return Tween<double>(begin: value);
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build() -> ${_translationTween.evaluate(animation)}');
+    print('\n');
     return Transform(
       transform: Matrix4.translationValues(
         0.0,
