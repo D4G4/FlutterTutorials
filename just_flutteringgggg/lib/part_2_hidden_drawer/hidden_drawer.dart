@@ -11,12 +11,32 @@ class HiddenDrawer extends StatefulWidget {
 
 class _HiddenDrawerState extends State<HiddenDrawer> {
   Screen activeScreen = restaurantScreen;
+  String selectedItemId = 'restaurant';
+
+  final menu = MenuList(items: [
+    MenuItem(id: 'restaurant', title: 'THE PADDOCK'),
+    MenuItem(id: 'other1', title: 'THE HERO'),
+    MenuItem(id: 'other2', title: 'HELP US GROW'),
+    MenuItem(id: 'other3', title: 'SETTINGS'),
+  ]);
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
         ZoomedScaffold(
-          menuScreen: MenuScreen(),
+          menuScreen: MenuScreen(
+            menuList: menu,
+            selectedMenuItemId: selectedItemId,
+            onMenuItemSelected: (String itemId) {
+              selectedItemId = itemId;
+              if (itemId == 'restaurant') {
+                activeScreen = restaurantScreen;
+              } else {
+                activeScreen = otherScreen;
+              }
+              setState(() {});
+            },
+          ),
           activeScreen: activeScreen,
         )
       ],

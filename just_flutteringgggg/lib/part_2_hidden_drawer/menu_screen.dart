@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:just_flutteringgggg/part_2_hidden_drawer/zoomed_scaffold.dart';
 
 class MenuScreen extends StatefulWidget {
+  final MenuList menuList;
+  final Function(String) onMenuItemSelected;
+  final String selectedMenuItemId;
+
+  MenuScreen({this.menuList, this.onMenuItemSelected, this.selectedMenuItemId});
   _MenuScreenState createState() => _MenuScreenState();
 }
 
@@ -99,13 +104,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   createMenuItems(MenuController controller) {
     print('State ${controller.state}');
-    final List titleList = [
-      'THE PADDOCK',
-      'THE HERO',
-      'HELP US GROW',
-      'SETTINGS',
-    ];
-
+    var selectedIndex = 0;
     List<AnimatedMenuItem> itemsList = [];
 
     var animationIntervalDuration = 0.5;
@@ -114,22 +113,29 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     var perItemDelay = (controller.state != MenuState.CLOSING) ? 0.15 : 0.0;
     //var perItemDelay = (controller.state == MenuState.OPENING) ? 0.15 : 0.0;
 
-    for (var i = 0; i < titleList.length; i++) {
+    for (var i = 0; i < widget.menuList.items.length; i++) {
+      MenuItem menuItem = widget.menuList.items[i];
       var startAnimation = i * perItemDelay;
       var endAnimation = animationIntervalDuration + perItemDelay;
       print('startAnimation $startAnimation');
       print('endAnimation $endAnimation');
       print('\n\n');
-      itemsList.add(AnimatedMenuItem(
-        curve: Interval(startAnimation, endAnimation, curve: Curves.easeOut),
-        duration: const Duration(milliseconds: 600),
-        menuState: controller.state,
-        menuListItem: _MenuListItem(
-          title: titleList[i],
-          isSelected: i == 0 ? true : false,
-          onTap: controller.close,
+      itemsList.add(
+        AnimatedMenuItem(
+          curve: Interval(startAnimation, endAnimation, curve: Curves.easeOut),
+          duration: const Duration(
+              milliseconds:
+                  600 /*Make it 4600 and see the difference after you'll close the drawer */),
+          menuState: controller.state,
+          menuListItem: _MenuListItem(
+              title: menuItem.title,
+              isSelected: widget.selectedMenuItemId == menuItem.id,
+              onTap: () {
+                widget.onMenuItemSelected(menuItem.id);
+                controller.close();
+              }),
         ),
-      ));
+      );
     }
     return Transform(
       transform: Matrix4.translationValues(0.0, 225.0, 0.0),
@@ -143,7 +149,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 /// `----------------------------------------------------------------------------------------`
 /// RealCase: when you change the theme from light to dark, the whole app doens't flip a switch,
 /// instead the entire theme animates.
-///it says `"Something about me is animatable"`
+/// it says `"Something about me is animatable"`
 class AnimatedMenuItem extends ImplicitlyAnimatedWidget {
   final _MenuListItem menuListItem;
   final Duration duration;
@@ -238,8 +244,15 @@ class _MenuListItem extends StatelessWidget {
 }
 
 class MenuList {
-  final List<_MenuListItem> menuList;
+  final List<MenuItem> items;
   final int selectedIndex;
 
-  MenuList({this.menuList, this.selectedIndex});
+  MenuList({this.items, this.selectedIndex});
+}
+
+class MenuItem {
+  final String id;
+  final String title;
+
+  MenuItem({this.id, this.title});
 }
