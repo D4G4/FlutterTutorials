@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:just_flutteringgggg/part_2_hidden_drawer/zoomed_scaffold.dart';
+import 'package:just_flutteringgggg/part2_hidden_drawer/zoomed_scaffold.dart';
 
 final GlobalKey menuScreenKey = GlobalKey(debugLabel: 'MenuScreen');
 

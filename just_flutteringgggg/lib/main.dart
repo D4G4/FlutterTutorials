@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:just_flutteringgggg/part1_page_reveal/material_page_revealer.dart';
-import 'package:just_flutteringgggg/part_2_hidden_drawer/hidden_drawer.dart';
+import 'package:just_flutteringgggg/part1_page_reveal/main_material_page_revealer.dart';
+import 'package:just_flutteringgggg/part2_hidden_drawer/main_hidden_drawer.dart';
+import 'package:just_flutteringgggg/part3_egg_timer/main_egg_timer.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,6 +13,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: HiddenDrawer());
+        home: EggTimer());
   }
 }
