@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:just_flutteringgggg/part3_egg_timer/time_display.dart';
 import 'package:just_flutteringgggg/part3_egg_timer/egg_timer_controls.dart';
 import 'package:just_flutteringgggg/part3_egg_timer/egg_timer_dial.dart';
+import 'package:just_flutteringgggg/part3_egg_timer/egg_timer.dart';
+
+//ambiggn.addidas@gmail.com
 
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
@@ -11,8 +14,46 @@ class EggTimer extends StatefulWidget {
 }
 
 class _EggTimerState extends State<EggTimer> {
+  EggTimerModel eggTimer;
+
+  _EggTimerState() {
+    eggTimer = EggTimerModel(
+      maxTime: const Duration(minutes: 35),
+      callback: _onTimerUpdate,
+    );
+  }
+
+  void _onTimerUpdate() {
+    setState(() {});
+  }
+
+  int _getTicksPerSection() {
+    int minutes = eggTimer.maxTime.inMinutes;
+    int ticksPerSection = 0;
+    for (var i = 2; i < minutes; i++) {
+      if (minutes % i == 0) {
+        ticksPerSection = i;
+        break;
+      }
+    }
+    return ticksPerSection;
+  }
+
+  _onTimeSelected(Duration newTime) {
+    print('onTimeSelected $newTime');
+    setState(() {
+      eggTimer.currentTime = newTime;
+    });
+  }
+
+  _onDialStopTurning(Duration newTime) {
+    eggTimer.currentTime = newTime;
+    eggTimer.resume();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('build of main ${eggTimer.currentTime}');
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -25,8 +66,18 @@ class _EggTimerState extends State<EggTimer> {
         child: Center(
           child: Column(
             children: <Widget>[
-              EggTimerTimeDisplay(), // Time Text
-              EggTimerDial(), // Dial
+              EggTimerTimeDisplay(
+                countdownTime: eggTimer.currentTime,
+                selectedTime: eggTimer.lastSelectedTime,
+                state: eggTimer.state,
+              ), // Time Text
+              EggTimerDial(
+                maxTime: eggTimer.maxTime,
+                currentTime: eggTimer.currentTime,
+                ticksPerSection: 5,
+                onTimeSelected: _onTimeSelected,
+                onDialStopTurning: _onDialStopTurning,
+              ), // Dial
               Expanded(
                 child: Container(),
               ),

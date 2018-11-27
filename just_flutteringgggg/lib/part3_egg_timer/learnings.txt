@@ -20,3 +20,15 @@ AspectRatio:
 What should be the amount of padding/margin from status bar?
 
 How to take care of textSize across different devices
+
+
+
+
+
+In flutter
+
+Quadration
+topSection is -ve rotation
+bottomSection is +ve rotation
+
+Rather than talking about 0 -> 360 they talk about 0 -> 180 & 0 -> -180

@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
 
-class EggTimerDialKnobWalaCircle extends StatefulWidget {
-  _EggTimerDialKnobWalaCircleState createState() =>
-      _EggTimerDialKnobWalaCircleState();
+class EggTimerDialKnobWaleCircles extends StatefulWidget {
+  final double rotationPercent;
+
+  EggTimerDialKnobWaleCircles({this.rotationPercent = 0.0});
+
+  _EggTimerDialKnobWaleCirclesState createState() =>
+      _EggTimerDialKnobWaleCirclesState();
 }
 
-class _EggTimerDialKnobWalaCircleState
-    extends State<EggTimerDialKnobWalaCircle> {
+class _EggTimerDialKnobWaleCirclesState
+    extends State<EggTimerDialKnobWaleCircles> {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -19,7 +24,7 @@ class _EggTimerDialKnobWalaCircleState
           width: double.infinity,
           height: double.infinity,
           child: CustomPaint(
-            painter: ArrowPainter(),
+            painter: ArrowPainter(rotationPercent: widget.rotationPercent),
           ),
         ),
         Container(
@@ -51,12 +56,16 @@ class _EggTimerDialKnobWalaCircleState
                   width: 1.5,
                 ),
               ),
-              child: Center(
-                child: Image.network(
-                  'https://avatars3.githubusercontent.com/u/14101776?s=400&v=4',
-                  width: 50.0,
-                  height: 50.0,
-                  color: Colors.black,
+              child: Transform(
+                transform: Matrix4.rotationZ(2 * pi * widget.rotationPercent),
+                alignment: Alignment.center,
+                child: Center(
+                  child: Image.network(
+                    'https://avatars3.githubusercontent.com/u/14101776?s=400&v=4',
+                    width: 50.0,
+                    height: 50.0,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
@@ -70,8 +79,9 @@ class _EggTimerDialKnobWalaCircleState
 /* Is being build in innerCircle (beneath InnermostCircle) */
 class ArrowPainter extends CustomPainter {
   final Paint dialArrowPaint;
+  final double rotationPercent;
 
-  ArrowPainter() : dialArrowPaint = Paint() {
+  ArrowPainter({this.rotationPercent = 0.0}) : dialArrowPaint = Paint() {
     dialArrowPaint.color = Colors.black;
     dialArrowPaint.style = PaintingStyle.fill;
   }
@@ -80,16 +90,17 @@ class ArrowPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.save();
 
-    canvas.translate(size.width / 2, 0.0);
-
+    double radius = size.height / 2;
+    canvas.translate(radius, radius);
+    canvas.rotate(2 * pi * rotationPercent);
     Path path = Path();
-    path.moveTo(0.0, -10.0); //Going up
-    path.lineTo(10.0, 5.0); //Going down and to the right
-    path.lineTo(-10.0, 5.0); //Going to bottom left
+    path.moveTo(0.0, -radius - 10.0); //Going up
+    path.lineTo(10.0, -radius + 5.0); //Going down and to the right
+    path.lineTo(-10.0, -radius + 5.0); //Going to bottom left
     path.close();
 
     canvas.drawPath(path, dialArrowPaint);
-    canvas.drawShadow(path, Colors.red, 3.0, false);
+    canvas.drawShadow(path, Colors.black, 3.0, false);
 
     canvas.restore();
   }
