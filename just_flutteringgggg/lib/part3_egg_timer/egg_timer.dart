@@ -25,28 +25,86 @@ class EggTimerModel {
   }
 
   void resume() {
-    print('resuming');
-    stopwatch.start();
-    state = EggTimerState.RUNNING;
-    startTime = _currentTime;
-    _tick();
+    if (state != EggTimerState.RUNNING) {
+      if (state == EggTimerState.READY) /**When user is letting go */ {
+        _currentTime = _roundToTheNearestMinute(_currentTime);
+        lastSelectedTime = _currentTime;
+      }
+      state = EggTimerState.RUNNING;
+      stopwatch.start();
+      startTime = _currentTime;
+      _tick();
+    }
   }
 
-  void pause() {}
+  void pause() {
+    if (state == EggTimerState.RUNNING) {
+      stopwatch.stop();
+      stopwatch.reset();
+      //lastSelectedTime = _currentTime;
+      state = EggTimerState.PAUSED;
+      if (null != callback) callback();
+    }
+  }
+
+  // reset() {
+  //   stopwatch.stop();
+  //   state = EggTimerState.READY;
+  //   _currentTime = Duration(minutes: 0);
+  //   lastSelectedTime = Duration(minutes: 0);
+  //   if (callback != null) callback();
+  // }
+
+  reset() {
+    if (state == EggTimerState.PAUSED) {
+      state = EggTimerState.READY;
+      _currentTime = const Duration(seconds: 0);
+      lastSelectedTime = _currentTime;
+      stopwatch.reset();
+
+      if (null != callback) {
+        callback();
+      }
+    }
+  }
+
+  // restart() {
+  //   stopwatch.reset();
+  //   stopwatch.start();
+  //   state = EggTimerState.RUNNING;
+  //   _currentTime = Duration(minutes: 0);
+  //   _tick();
+  //   if (callback != null) callback();
+  // }
+  restart() {
+    if (state == EggTimerState.PAUSED) {
+      state = EggTimerState.RUNNING;
+      _currentTime = lastSelectedTime;
+      stopwatch.reset();
+      stopwatch.start();
+      _tick();
+    }
+  }
 
   _tick() {
-    _currentTime = startTime - stopwatch.elapsed;
-    print('currentTime = ${_currentTime.inSeconds}');
-    if (_currentTime.inSeconds > 0) {
-      Timer(const Duration(seconds: 1), () => _tick());
-    } else {
-      stopwatch.reset();
-      state = EggTimerState.READY;
-      startTime = null;
+    if (state == EggTimerState.RUNNING) {
+      _currentTime = startTime - stopwatch.elapsed;
+      //print('currentTime = ${_currentTime.inSeconds}');
+      if (_currentTime.inSeconds > 0) {
+        Timer(const Duration(seconds: 1), () => _tick());
+      } else {
+        stopwatch.reset();
+        state = EggTimerState.READY;
+        startTime = null;
+      }
+      if (null != callback) {
+        callback();
+      }
     }
-    if (null != callback) {
-      callback();
-    }
+  }
+
+  Duration _roundToTheNearestMinute(Duration currentTime) {
+    return Duration(minutes: (currentTime.inSeconds / 60).round());
   }
 }
 

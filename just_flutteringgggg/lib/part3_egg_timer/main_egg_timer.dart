@@ -40,7 +40,7 @@ class _EggTimerState extends State<EggTimer> {
   }
 
   _onTimeSelected(Duration newTime) {
-    print('onTimeSelected $newTime');
+    // print('onTimeSelected $newTime');
     setState(() {
       eggTimer.currentTime = newTime;
     });
@@ -53,7 +53,6 @@ class _EggTimerState extends State<EggTimer> {
 
   @override
   Widget build(BuildContext context) {
-    print('build of main ${eggTimer.currentTime}');
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -72,6 +71,7 @@ class _EggTimerState extends State<EggTimer> {
                 state: eggTimer.state,
               ), // Time Text
               EggTimerDial(
+                state: eggTimer.state,
                 maxTime: eggTimer.maxTime,
                 currentTime: eggTimer.currentTime,
                 ticksPerSection: 5,
@@ -81,7 +81,13 @@ class _EggTimerState extends State<EggTimer> {
               Expanded(
                 child: Container(),
               ),
-              EggTimerControls(), // Buttons
+              EggTimerControls(
+                state: eggTimer.state,
+                onPause: eggTimer.pause,
+                onResume: eggTimer.resume,
+                onReset: eggTimer.reset,
+                onRestart: eggTimer.restart,
+              ), // Buttons
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:just_flutteringgggg/part3_egg_timer/egg_timer_knob.dart';
+import 'package:just_flutteringgggg/part3_egg_timer/egg_timer.dart';
 import 'package:just_flutteringgggg/helper/radial_drag_gesture_detector.dart';
 
 import 'dart:math';
@@ -15,6 +16,8 @@ class EggTimerDial extends StatefulWidget {
   final Function(Duration) onTimeSelected;
   final Function(Duration) onDialStopTurning;
 
+  final EggTimerState state;
+
   const EggTimerDial({
     Key key,
     this.currentTime = const Duration(minutes: 0),
@@ -22,6 +25,7 @@ class EggTimerDial extends StatefulWidget {
     this.ticksPerSection = 5,
     this.onTimeSelected,
     this.onDialStopTurning,
+    this.state,
   }) : super(key: key);
 
   @override
@@ -30,13 +34,65 @@ class EggTimerDial extends StatefulWidget {
   }
 }
 
-class EggTimerDialState extends State<EggTimerDial> {
+class EggTimerDialState extends State<EggTimerDial>
+    with TickerProviderStateMixin {
+  static const RESET_SPEED_PERCENT_PER_SECOND = 4.0;
+  AnimationController resetToZeroController;
+  Animation resetAnimation;
+
+  EggTimerState previousState;
+  double previousPercentage = 0.0;
+
+  void initState() {
+    super.initState();
+    resetToZeroController = AnimationController(
+      vsync:
+          this, /** duration will be based on how far it needs to go. It should go faster the closer it is to 0 */
+    );
+  }
+
+  @override
+  void dispose() {
+    resetToZeroController.dispose();
+    super.dispose();
+  }
+
   double _rotationPercent() {
     return widget.currentTime.inSeconds / widget.maxTime.inSeconds;
   }
 
   @override
   Widget build(BuildContext context) {
+    // print('Widget state = ${widget.state}');
+    // print('Previous state= ${previousState}');
+    if (widget.currentTime.inSeconds == 0 &&
+        previousState != EggTimerState.READY) {
+      //print('I am inside');
+      resetAnimation = Tween(begin: previousPercentage, end: 0.0)
+          .animate(resetToZeroController)
+            ..addListener(() {
+              setState(() {});
+            })
+            ..addStatusListener((status) {
+              //print('status $status');
+              if (status == AnimationStatus.completed) {
+                //print('Resetting animation to null');
+                setState(() {
+                  resetAnimation = null;
+                });
+              }
+            });
+      //print('resetAnimation nulll? ${resetAnimation == null}');
+      resetToZeroController.duration = Duration(
+          milliseconds:
+              ((previousPercentage / RESET_SPEED_PERCENT_PER_SECOND) * 1000)
+                  .round());
+      resetToZeroController.forward(from: 0.0);
+    }
+
+    previousState = widget.state;
+    previousPercentage = _rotationPercent();
+
     return DialTurnGestureDetector(
       onTimeSelected: widget.onTimeSelected,
       onDialStopTurning: widget.onDialStopTurning,
@@ -81,7 +137,9 @@ class EggTimerDialState extends State<EggTimerDial> {
                       ),
                     ),
                     EggTimerDialKnobWaleCircles(
-                      rotationPercent: _rotationPercent(),
+                      rotationPercent: resetAnimation != null
+                          ? resetAnimation.value
+                          : _rotationPercent(),
                     ),
                   ],
                 ),
@@ -225,12 +283,22 @@ class _DialTurnGestureDetectorState extends State<DialTurnGestureDetector> {
   _onDragUpdate(PolarCoord polarCoord) {
     // print(polarCoord.toString());
     if (null != startCoord) {
-      final swipedAngle = polarCoord.angle - startCoord.angle;
-      final swipeAnglePercentage = swipedAngle / (2 * pi);
+      var swipedAngle = polarCoord.angle - startCoord.angle;
+      swipedAngle = swipedAngle >= 0.0 ? swipedAngle : swipedAngle + (2 * pi);
+      print('2 * pi = ${2 * pi}');
+      double swipeAnglePercentage = swipedAngle / (2 * pi);
+
+      // if (swipeAnglePercentage < 0) {
+      //   swipeAnglePercentage = 1.0 + swipeAnglePercentage;
+      //   print('swipedAnglePercentage $swipeAnglePercentage');
+      // }
+
       final timeDiffInSeconds =
           (swipeAnglePercentage * widget.maxTime.inSeconds).round();
+
       final newTimeInSeconds = startDragTime.inSeconds + timeDiffInSeconds;
       selectedTime = Duration(seconds: newTimeInSeconds);
+
       if (null != widget.onTimeSelected) {
         widget.onTimeSelected(selectedTime);
       }
