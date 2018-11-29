@@ -46,6 +46,7 @@ class BottomControls extends StatelessWidget {
                         )
                       ],
                     ),
+                    textAlign: TextAlign.center,
                   );
                 },
               ),
