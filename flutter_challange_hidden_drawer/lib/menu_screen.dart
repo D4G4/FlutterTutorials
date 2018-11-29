@@ -36,6 +36,9 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         selectorYTop = newYTop;
       });
     }
+
+    print('YTop =  $newYTop');
+    print('\n');
   }
 
   @override
